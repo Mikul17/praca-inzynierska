@@ -1,9 +1,9 @@
 package org.mikul17.rpq.common;
 
+import java.util.List;
+
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
-import java.util.List;
 
 @Getter
 @Setter

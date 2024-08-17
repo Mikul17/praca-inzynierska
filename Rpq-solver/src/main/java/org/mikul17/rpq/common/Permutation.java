@@ -1,33 +1,31 @@
 package org.mikul17.rpq.common;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
-public record Permutation(UUID id,List<Task> permutation, int cmax) {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-    public static Permutation of(List<Task> permutation) {
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class Permutation {
+    private List<Task> permutation;
+    private int cmax;
+
+    public static Permutation of (List<Task> permutation) {
         int cmax = 0;
         int time = 0;
         for (Task task : permutation) {
             time = Math.max(task.r(), time) + task.p();
             cmax = Math.max(cmax, time + task.q());
         }
-        return new Permutation( UUID.randomUUID(),permutation, cmax);
+        return new Permutation(permutation, cmax);
     }
 
-    public static Permutation of(List<Task> permutation, int cmax) {
-        return new Permutation(UUID.randomUUID(),permutation, cmax);
-    }
-
-    public Permutation update(List<Task> permutation) {
-        return of(permutation);
-    }
-
-    @Override
-    public String toString() {
-        return "Permutation{" +
-                "id=" + id +
-                '}';
+    public static Permutation of (List<Task> permutation, int cmax) {
+        return new Permutation(permutation, cmax);
     }
 }
