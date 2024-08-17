@@ -37,4 +37,4 @@ jobs:
 
     - name: Build and Test Backend
       run: mvn clean verify
-      working-directory: ./backend
+      working-directory: ./backend/Rpq-solver
