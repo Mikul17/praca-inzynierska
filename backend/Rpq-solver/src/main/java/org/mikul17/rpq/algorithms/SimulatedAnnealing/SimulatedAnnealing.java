@@ -48,7 +48,7 @@ public class SimulatedAnnealing implements Solver<SimulatedAnnealingParameters, 
 
         solution.setBestCmax(bestCmax);
         solution.setBestPermutation(bestPermutation);
-        solution.setDuration(duration / 1_000_000);
+        solution.setDuration(duration);
 
         return solution;
     }
