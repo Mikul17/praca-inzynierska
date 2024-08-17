@@ -14,6 +14,10 @@ public abstract class Solution {
     protected List<Permutation> allPermutations;
     protected Long duration;
 
+    public void setDuration (Long duration) {
+        this.duration = duration/ 1_000_000;
+    }
+
     public Solution () {
         allPermutations = new ArrayList<>();
     }
