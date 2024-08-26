@@ -3,6 +3,9 @@ package org.mikul17.rpq;
 import java.io.IOException;
 import java.util.List;
 
+import org.mikul17.rpq.algorithms.Schrage.Schrage;
+import org.mikul17.rpq.algorithms.Schrage.SchrageParameters;
+import org.mikul17.rpq.algorithms.Schrage.SchrageSolution;
 import org.mikul17.rpq.algorithms.SimulatedAnnealing.SimulatedAnnealing;
 import org.mikul17.rpq.algorithms.SimulatedAnnealing.SimulatedAnnealingParameters;
 import org.mikul17.rpq.algorithms.SimulatedAnnealing.SimulatedAnnealingSolution;
@@ -21,6 +24,7 @@ public class RpqSolverApplication {
         //SpringApplication.run(RpqSolverApplication.class, args);
         SimulatedAnnealing sa = new SimulatedAnnealing();
         TabuSearch ts = new TabuSearch();
+        Schrage schrage = new Schrage();
         List<Task> tasks = List.of(
                 new Task(1, 8354, 1, 5507),
                 new Task(2, 8455, 696, 512),
@@ -58,14 +62,19 @@ public class RpqSolverApplication {
                 .tabuListSize(40)
                 .tasks(tasks)
                 .build();
+        SchrageParameters schrageParameters = SchrageParameters.builder()
+                .tasks(tasks)
+                .build();
 
         //SimulatedAnnealingSolution s = sa.solve(p);
-        TabuSearchSolution s = ts.solve(tsParams);
+        //TabuSearchSolution s = ts.solve(tsParams);
+        SchrageSolution s = schrage.solve(schrageParameters);
         System.out.println("________________________ Results ________________________");
         System.out.println("Initial cmax " + Permutation.of(p.getTasks()).getCmax());
         System.out.println("Cmax: " + s.getBestCmax());
         System.out.println("Time: " + s.getDuration() + " ms");
-        System.out.println("Best permutation: " + s.getBestPermutation().getCmax());
+        System.out.println("Best permutation: ");
+        s.getBestPermutation().printPermutation();
 
         System.out.println("________________________________________________________");
     }
