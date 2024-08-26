@@ -73,7 +73,8 @@ public class RpqSolverApplication {
         System.out.println("Initial cmax " + Permutation.of(p.getTasks()).getCmax());
         System.out.println("Cmax: " + s.getBestCmax());
         System.out.println("Time: " + s.getDuration() + " ms");
-        System.out.println("Best permutation: " + s.getBestPermutation().getCmax());
+        System.out.println("Best permutation: ");
+        s.getBestPermutation().printPermutation();
 
         System.out.println("________________________________________________________");
     }

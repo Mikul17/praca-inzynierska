@@ -13,15 +13,14 @@ public class Schrage implements Solver<SchrageParameters, SchrageSolution> {
     public SchrageSolution solve(SchrageParameters parameters) {
         SchrageSolution solution = new SchrageSolution();
 
-        /* Temporary variables used in algorithm */
-        PriorityQueue<Task> readyQueue = new PriorityQueue<>(Comparator.comparing(Task::q));
+        PriorityQueue<Task> readyQueue = new PriorityQueue<>(Comparator.comparing(Task::q).reversed());
         PriorityQueue<Task> notReadyQueue = new PriorityQueue<>(Comparator.comparing(Task::r));
 
         notReadyQueue.addAll(parameters.getTasks());
         Permutation bestPermutation = new Permutation();
         int currentTime = 0;
+        int cmax = 0;
         long startTime = System.nanoTime();
-        /* main algorithm loop */
 
         while(!readyQueue.isEmpty() || !notReadyQueue.isEmpty()) {
             while(!notReadyQueue.isEmpty() && notReadyQueue.peek().r() <= currentTime) {
@@ -33,17 +32,17 @@ public class Schrage implements Solver<SchrageParameters, SchrageSolution> {
                 Task task = readyQueue.poll();
                 currentTime += task.p();
                 bestPermutation.add(task);
+                int taskEnd = currentTime + task.q();
+                cmax = Math.max(cmax, taskEnd);
             }
         }
 
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
-        bestPermutation.printPermutation();
         solution.setBestPermutation(Permutation.of(bestPermutation.getPermutation()));
-        solution.setBestCmax(calculateCmax(bestPermutation.getPermutation()));
+        solution.setBestCmax(cmax);
         solution.setDuration(duration);
 
         return solution;
     }
-
 }
