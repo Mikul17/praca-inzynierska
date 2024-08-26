@@ -1,17 +1,23 @@
 package org.mikul17.rpq.algorithms.SimulatedAnnealing;
 
 import java.util.*;
+import java.util.function.Consumer;
 
+import lombok.extern.slf4j.Slf4j;
 import org.mikul17.rpq.common.Permutation;
 import org.mikul17.rpq.common.Solver;
 import org.mikul17.rpq.common.Task;
+import org.springframework.stereotype.Component;
 
+@Component
+@Slf4j
 public class SimulatedAnnealing implements Solver<SimulatedAnnealingParameters, SimulatedAnnealingSolution> {
     private final Random random = new Random();
 
     @Override
-    public SimulatedAnnealingSolution solve (SimulatedAnnealingParameters parameters) {
+    public SimulatedAnnealingSolution solve (SimulatedAnnealingParameters parameters, Consumer<SimulatedAnnealingSolution> callback) {
         SimulatedAnnealingSolution solution = new SimulatedAnnealingSolution();
+        log.info("Starting Simulated Annealing algorithm");
         long startTime = System.nanoTime();
 
         /* Temporary variables used in algorithm */
@@ -31,6 +37,7 @@ public class SimulatedAnnealing implements Solver<SimulatedAnnealingParameters, 
                     acceptanceProbability(previousCmax, newCmax, solution.temperature.get(i));
             solution.addPermutation(candidate);
             solution.addProbability(acceptanceProbability);
+            callback.accept(solution);
 
             if (random.nextDouble(1.0) < acceptanceProbability) {
                 previousCmax = newCmax;
@@ -45,6 +52,7 @@ public class SimulatedAnnealing implements Solver<SimulatedAnnealingParameters, 
         }
         long endTime = System.nanoTime();
         long duration = endTime - startTime;
+        log.info("Simulated Annealing algorithm finished in {} ms", duration / 1000000);
 
         solution.setBestCmax(bestCmax);
         solution.setBestPermutation(bestPermutation);

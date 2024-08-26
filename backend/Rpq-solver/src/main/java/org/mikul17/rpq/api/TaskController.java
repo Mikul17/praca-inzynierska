@@ -1,34 +1,47 @@
 package org.mikul17.rpq.api;
 
 import lombok.RequiredArgsConstructor;
-import org.mikul17.rpq.api.Websocket.TaskSchedulerHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.mikul17.rpq.algorithms.SimulatedAnnealing.SimulatedAnnealing;
+import org.mikul17.rpq.algorithms.SimulatedAnnealing.SimulatedAnnealingParameters;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
 @RestController
+@Slf4j
 @RequiredArgsConstructor
 public class TaskController {
 
-    private final TaskSchedulerHandler taskSchedulerHandler;
+    private final SimulatedAnnealing simulatedAnnealing;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @PostMapping("/start-scheduling")
-    public String startScheduling() {
-        // Logika przetwarzania pliku, uruchomienie algorytmu, itp.
-
-        new Thread(() -> {
+    public ResponseEntity<String> startScheduling(@RequestBody TestRequest request) {
+        CompletableFuture.runAsync(() -> {
             try {
-                // Przykład: wysyłanie danych do WebSocket co 1 sekundę
-                for (int i = 0; i < 10; i++) {
-                    String message = "Uszeregowanie zadań " + (i + 1);
-                    taskSchedulerHandler.sendMessage(message);
-                    Thread.sleep(1000); // Symulacja czasu przetwarzania
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+                log.debug("Request body: {}", request);
+                SimulatedAnnealingParameters parameters = SimulatedAnnealingParameters.builder()
+                        .tasks(request.getTasks())
+                        .coolingRate(request.getCoolingRate())
+                        .maxIterations(request.getMaxIterations())
+                        .initialTemperature(request.getInitialTemperature())
+                        .build();
 
-        return "Scheduling started!";
+                simulatedAnnealing.solve(parameters, solution -> {
+                    messagingTemplate.convertAndSend("/scheduler/solution/"+request.getId(), solution);
+                });
+            } catch (Exception e) {
+                e.printStackTrace(); // Log the exception
+            }
+        });
+
+        return ResponseEntity.ok("Scheduling started for id" + request.getId());
     }
 
 }

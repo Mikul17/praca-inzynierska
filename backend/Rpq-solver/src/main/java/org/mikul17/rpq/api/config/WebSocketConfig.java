@@ -1,17 +1,23 @@
 package org.mikul17.rpq.api.config;
 
-import org.mikul17.rpq.api.Websocket.TaskSchedulerHandler;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.config.annotation.*;
 
-@EnableWebSocket
+@EnableWebSocketMessageBroker
 @Configuration
-public class WebSocketConfig implements WebSocketConfigurer {
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
     @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new TaskSchedulerHandler(), "/task-scheduler")
-                .setAllowedOrigins("*");
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/scheduler");
+        config.setApplicationDestinationPrefixes("/app");
+    }
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/api/ws")
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
     }
 }

@@ -8,6 +8,7 @@ import org.mikul17.rpq.common.Task;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Class that represents Tabu Search algorithm.
@@ -45,7 +46,7 @@ public class TabuSearch implements Solver<TabuSearchParameters, TabuSearchSoluti
      * @see TabuSearchSolution
      */
     @Override
-    public TabuSearchSolution solve (TabuSearchParameters parameters) {
+    public TabuSearchSolution solve (TabuSearchParameters parameters, Consumer<TabuSearchSolution> callback) {
         TabuSearchSolution solution = new TabuSearchSolution();
         long startTime = System.nanoTime();
 
