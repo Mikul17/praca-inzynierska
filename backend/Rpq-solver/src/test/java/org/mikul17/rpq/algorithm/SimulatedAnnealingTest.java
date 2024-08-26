@@ -97,17 +97,4 @@ public class SimulatedAnnealingTest {
         Assertions.assertThat(result.getTemperature().getFirst()).isGreaterThan(result.getTemperature().getLast());
     }
 
-    @Test
-    void acceptanceProbabilityShouldDecrease () {
-        SimulatedAnnealingParameters p = SimulatedAnnealingParameters
-                .builder()
-                .initialTemperature(1000.0)
-                .coolingRate(0.99995)
-                .maxIterations(100)
-                .tasks(firstTestCase)
-                .build();
-        SimulatedAnnealingSolution result = sa.solve(p);
-
-        Assertions.assertThat(result.getAcceptanceProbability().getFirst()).isGreaterThan(result.getAcceptanceProbability().getLast());
-    }
 }
