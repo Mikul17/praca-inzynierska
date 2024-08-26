@@ -19,29 +19,12 @@ import java.util.List;
  */
 public class TabuSearch implements Solver<TabuSearchParameters, TabuSearchSolution> {
 
-
-    /**
-     * Class that represents a move in the Tabu Search algorithm which
-     * will be stored in the tabu list.
-     *
-     * @field firstTask - index of the first task to swap
-     * @field secondTask - index of the second task to swap
-     * @field moveCmax - Cmax value after swapping tasks
-     */
-    @Builder
-    private static class TabuMove {
-        public int firstTask;
-        public int secondTask;
-        public int moveCmax;
-    }
-
     /**
      * Solves the scheduling problem using the Tabu Search algorithm.
      *
      * @param parameters - contains all necessary parameters for the Tabu Search algorithm
-     * @see TabuSearchParameters
-     *
      * @return TabuSearchSolution - object containing the best permutation and Cmax value
+     * @see TabuSearchParameters
      * @see TabuSearchSolution
      */
     @Override
@@ -56,16 +39,16 @@ public class TabuSearch implements Solver<TabuSearchParameters, TabuSearchSoluti
         List<TabuMove> tabuList = new ArrayList<>(parameters.tabuListSize);
 
         /* main algorithm loop */
-        for(int i = 0; i < parameters.maxIterations; i++) {
+        for (int i = 0; i < parameters.maxIterations; i++) {
             TabuMove result = findBestTabu(copy, tabuList);
             int currentlyBestCmax = result.moveCmax;
 
             Collections.swap(copy, result.firstTask, result.secondTask);
             addMoveToTabuList(result, tabuList, parameters.tabuListSize);
 
-            if(currentlyBestCmax < bestCmax) {
+            if (currentlyBestCmax < bestCmax) {
                 bestCmax = currentlyBestCmax;
-                bestPermutation =Permutation.of(copy);
+                bestPermutation = Permutation.of(copy);
             }
         }
 
@@ -79,16 +62,15 @@ public class TabuSearch implements Solver<TabuSearchParameters, TabuSearchSoluti
         return solution;
     }
 
-
     /**
      * Adds a move to the tabu list. If the tabu list is full, it removes the first element.
      *
-     * @param result - move to be added to the tabu list
+     * @param result   - move to be added to the tabu list
      * @param tabuList - list of forbidden moves
-     * @param maxSize - maximum size of the tabu list
+     * @param maxSize  - maximum size of the tabu list
      */
     private void addMoveToTabuList (TabuMove result, List<TabuMove> tabuList, int maxSize) {
-        if(tabuList.size() >= maxSize) {
+        if (tabuList.size() >= maxSize) {
             tabuList.removeFirst();
         }
         tabuList.add(result);
@@ -98,9 +80,8 @@ public class TabuSearch implements Solver<TabuSearchParameters, TabuSearchSoluti
      * Finds the best move to make. It checks all possible permutations of tasks
      * and returns the best one.
      *
-     * @param copy - list of tasks to be checked
+     * @param copy     - list of tasks to be checked
      * @param tabuList - list of forbidden moves
-     *
      * @return TabuMove - object containing the best move
      * @see TabuMove
      */
@@ -109,11 +90,11 @@ public class TabuSearch implements Solver<TabuSearchParameters, TabuSearchSoluti
         int secondBestTask = -1;
         int bestCmax = Integer.MAX_VALUE;
 
-        for(int i=0; i<copy.size(); i++) {
-            for(int j=i+1; j<copy.size(); j++) {
+        for (int i = 0; i < copy.size(); i++) {
+            for (int j = i + 1; j < copy.size(); j++) {
                 Collections.swap(copy, i, j);
                 int newCmax = calculateCmax(copy);
-                if(newCmax < bestCmax && !isTabu(i, j, tabuList)) {
+                if (newCmax < bestCmax && !isTabu(i, j, tabuList)) {
                     bestCmax = newCmax;
                     firstBestTask = i;
                     secondBestTask = j;
@@ -121,28 +102,43 @@ public class TabuSearch implements Solver<TabuSearchParameters, TabuSearchSoluti
                 Collections.swap(copy, i, j);
             }
         }
-        return TabuMove.builder()
+        return TabuMove
+                .builder()
                 .firstTask(firstBestTask)
                 .secondTask(secondBestTask)
                 .moveCmax(bestCmax)
                 .build();
     }
 
-
     /**
      * Checks if a move is forbidden (is present in the tabu list).
      *
-     * @param i - index of the first task
-     * @param j - index of the second task
+     * @param i        - index of the first task
+     * @param j        - index of the second task
      * @param tabuList - list of forbidden moves
      * @return boolean - true if the move is forbidden, false otherwise
      */
     private boolean isTabu (int i, int j, List<TabuMove> tabuList) {
-        for(TabuMove move : tabuList) {
-            if(move.firstTask == i && move.secondTask == j) {
+        for (TabuMove move : tabuList) {
+            if (move.firstTask == i && move.secondTask == j) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Class that represents a move in the Tabu Search algorithm which
+     * will be stored in the tabu list.
+     *
+     * @field firstTask - index of the first task to swap
+     * @field secondTask - index of the second task to swap
+     * @field moveCmax - Cmax value after swapping tasks
+     */
+    @Builder
+    private static class TabuMove {
+        public int firstTask;
+        public int secondTask;
+        public int moveCmax;
     }
 }
