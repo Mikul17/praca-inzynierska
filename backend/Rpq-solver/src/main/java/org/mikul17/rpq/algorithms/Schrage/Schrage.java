@@ -10,11 +10,15 @@ import java.util.PriorityQueue;
 public class Schrage implements Solver<SchrageParameters, SchrageSolution> {
 
     @Override
-    public SchrageSolution solve(SchrageParameters parameters) {
+    public SchrageSolution solve (SchrageParameters parameters) {
         SchrageSolution solution = new SchrageSolution();
 
-        PriorityQueue<Task> readyQueue = new PriorityQueue<>(Comparator.comparing(Task::q).reversed());
-        PriorityQueue<Task> notReadyQueue = new PriorityQueue<>(Comparator.comparing(Task::r));
+        PriorityQueue<Task> readyQueue = new PriorityQueue<>(
+                Comparator.comparing(Task::q).reversed()
+        );
+        PriorityQueue<Task> notReadyQueue = new PriorityQueue<>(
+                Comparator.comparing(Task::r)
+        );
 
         notReadyQueue.addAll(parameters.getTasks());
         Permutation bestPermutation = new Permutation();
@@ -22,11 +26,11 @@ public class Schrage implements Solver<SchrageParameters, SchrageSolution> {
         int cmax = 0;
         long startTime = System.nanoTime();
 
-        while(!readyQueue.isEmpty() || !notReadyQueue.isEmpty()) {
-            while(!notReadyQueue.isEmpty() && notReadyQueue.peek().r() <= currentTime) {
+        while (!readyQueue.isEmpty() || !notReadyQueue.isEmpty()) {
+            while (!notReadyQueue.isEmpty() && notReadyQueue.peek().r() <= currentTime) {
                 readyQueue.add(notReadyQueue.poll());
             }
-            if(readyQueue.isEmpty()) {
+            if (readyQueue.isEmpty()) {
                 currentTime = notReadyQueue.peek().r();
             } else {
                 Task task = readyQueue.poll();

@@ -1,21 +1,18 @@
 package org.mikul17.rpq;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.mikul17.rpq.algorithms.Schrage.Schrage;
 import org.mikul17.rpq.algorithms.Schrage.SchrageParameters;
 import org.mikul17.rpq.algorithms.Schrage.SchrageSolution;
 import org.mikul17.rpq.algorithms.SimulatedAnnealing.SimulatedAnnealing;
 import org.mikul17.rpq.algorithms.SimulatedAnnealing.SimulatedAnnealingParameters;
-import org.mikul17.rpq.algorithms.SimulatedAnnealing.SimulatedAnnealingSolution;
 import org.mikul17.rpq.algorithms.TabuSearch.TabuSearch;
 import org.mikul17.rpq.algorithms.TabuSearch.TabuSearchParameters;
-import org.mikul17.rpq.algorithms.TabuSearch.TabuSearchSolution;
 import org.mikul17.rpq.common.Permutation;
 import org.mikul17.rpq.common.Task;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.io.IOException;
+import java.util.List;
 
 @SpringBootApplication
 public class RpqSolverApplication {
@@ -49,20 +46,23 @@ public class RpqSolverApplication {
                 new Task(21, 1808, 20, 5363),
                 new Task(22, 114, 874, 5494),
                 new Task(23, 3815, 472, 759),
-                new Task(24, 2734, 482, 7478));
-        SimulatedAnnealingParameters p =
-                SimulatedAnnealingParameters.builder()
-                        .initialTemperature(1000.0)
-                        .coolingRate(0.99995)
-                        .maxIterations(100_000)
-                        .tasks(tasks)
-                        .build();
-        TabuSearchParameters tsParams = TabuSearchParameters.builder()
+                new Task(24, 2734, 482, 7478)
+        );
+        SimulatedAnnealingParameters p = SimulatedAnnealingParameters
+                .builder()
+                .initialTemperature(1000.0)
+                .coolingRate(0.99995)
+                .maxIterations(100_000)
+                .tasks(tasks)
+                .build();
+        TabuSearchParameters tsParams = TabuSearchParameters
+                .builder()
                 .maxIterations(100_000)
                 .tabuListSize(40)
                 .tasks(tasks)
                 .build();
-        SchrageParameters schrageParameters = SchrageParameters.builder()
+        SchrageParameters schrageParameters = SchrageParameters
+                .builder()
                 .tasks(tasks)
                 .build();
 
