@@ -1,18 +1,19 @@
 package org.mikul17.rpq.common;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Permutation {
-    private List<Task> permutation;
+    private List<Task> permutation = new ArrayList<>();
     private int cmax;
 
     public static Permutation of (List<Task> permutation) {
@@ -27,5 +28,16 @@ public class Permutation {
 
     public static Permutation of (List<Task> permutation, int cmax) {
         return new Permutation(permutation, cmax);
+    }
+
+    public void add (Task task) {
+        permutation.add(task);
+    }
+
+    public void printPermutation () {
+        for (Task task : permutation) {
+            System.out.print(task.id() + " ");
+        }
+        System.out.println();
     }
 }

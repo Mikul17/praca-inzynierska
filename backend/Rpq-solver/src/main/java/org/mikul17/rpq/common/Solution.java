@@ -1,10 +1,10 @@
 package org.mikul17.rpq.common;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,12 +14,12 @@ public abstract class Solution {
     protected List<Permutation> allPermutations;
     protected Long duration;
 
-    public void setDuration (Long duration) {
-        this.duration = duration/ 1_000_000;
-    }
-
     public Solution () {
         allPermutations = new ArrayList<>();
+    }
+
+    public void setDuration (Long duration) {
+        this.duration = duration / 1_000_000;
     }
 
     public void addPermutation (List<Task> permutation) {

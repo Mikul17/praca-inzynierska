@@ -2,16 +2,21 @@ package org.mikul17.rpq.algorithms.SimulatedAnnealing;
 
 import java.util.*;
 import java.util.function.Consumer;
-
 import lombok.extern.slf4j.Slf4j;
 import org.mikul17.rpq.common.Permutation;
 import org.mikul17.rpq.common.Solver;
 import org.mikul17.rpq.common.Task;
 import org.springframework.stereotype.Component;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 @Component
 @Slf4j
 public class SimulatedAnnealing implements Solver<SimulatedAnnealingParameters, SimulatedAnnealingSolution> {
+
+
     private final Random random = new Random();
 
     @Override
@@ -33,8 +38,11 @@ public class SimulatedAnnealing implements Solver<SimulatedAnnealingParameters, 
             List<Task> candidate = new ArrayList<>(copy);
             swapTwoRandomElements(candidate);
             int newCmax = calculateCmax(candidate);
-            double acceptanceProbability =
-                    acceptanceProbability(previousCmax, newCmax, solution.temperature.get(i));
+            double acceptanceProbability = acceptanceProbability(
+                    previousCmax,
+                    newCmax,
+                    solution.temperature.get(i)
+            );
             solution.addPermutation(candidate);
             solution.addProbability(acceptanceProbability);
             callback.accept(solution);

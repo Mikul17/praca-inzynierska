@@ -8,12 +8,10 @@ import org.mikul17.rpq.common.SolverParameters;
  *
  * @field maxIterations - number of iterations TabuSearch algorithm will perform
  * @field tabuListSize - size of tabu list containing forbidden moves
- *
  * @see SolverParameters
  */
 @SuperBuilder
 public class TabuSearchParameters extends SolverParameters {
     protected int maxIterations;
     protected int tabuListSize;
-
 }
