@@ -24,7 +24,7 @@ public class SchrageTest {
                 .builder()
                 .tasks(firstTestCase)
                 .build();
-        SchrageSolution result = schrage.solve(p);
+        SchrageSolution result = schrage.solve(p, solution -> {});
 
         Assertions.assertThat(result.getBestCmax()).isLessThan(firstTestCaseWorstCmax);
         Assertions.assertThat(result.getBestCmax()).isLessThanOrEqualTo(firstTestCaseAcceptableCmax);
@@ -37,7 +37,7 @@ public class SchrageTest {
                 .builder()
                 .tasks(secondTestCase)
                 .build();
-        SchrageSolution result = schrage.solve(p);
+        SchrageSolution result = schrage.solve(p, solution -> {});
 
         Assertions.assertThat(result.getBestCmax()).isLessThan(secondTestCaseWorstCmax);
         Assertions.assertThat(result.getBestCmax()).isLessThanOrEqualTo(secondTestCaseAcceptableCmax);
@@ -50,7 +50,7 @@ public class SchrageTest {
                 .builder()
                 .tasks(thirdTestCase)
                 .build();
-        SchrageSolution result = schrage.solve(p);
+        SchrageSolution result = schrage.solve(p, solution -> {});
 
         Assertions.assertThat(result.getBestCmax()).isLessThan(thirdTestCaseWorstCmax);
         Assertions.assertThat(result.getBestCmax()).isLessThanOrEqualTo(thirdTestCaseAcceptableCmax);
@@ -63,7 +63,7 @@ public class SchrageTest {
                 .builder()
                 .tasks(fourthTestCase)
                 .build();
-        SchrageSolution result = schrage.solve(p);
+        SchrageSolution result = schrage.solve(p, solution -> {});
 
         Assertions.assertThat(result.getBestCmax()).isLessThan(fourthTestCaseWorstCmax);
         Assertions.assertThat(result.getBestCmax()).isLessThanOrEqualTo(fourthTestCaseAcceptableCmax);

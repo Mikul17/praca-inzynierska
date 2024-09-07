@@ -1,4 +1,4 @@
-package org.mikul17.rpq.common;
+package org.mikul17.rpq.algorithms.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Base class for all solver parameters to be used in the application
@@ -20,4 +21,6 @@ import java.util.List;
 @NoArgsConstructor
 public abstract class SolverParameters {
     protected List<Task> tasks;
+
+    public abstract void fromMap(Map<String, Object> map);
 }

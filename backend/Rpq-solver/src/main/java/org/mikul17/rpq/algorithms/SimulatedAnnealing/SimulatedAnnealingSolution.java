@@ -1,7 +1,7 @@
 package org.mikul17.rpq.algorithms.SimulatedAnnealing;
 
 import lombok.Getter;
-import org.mikul17.rpq.common.Solution;
+import org.mikul17.rpq.algorithms.common.Solution;
 
 import java.util.ArrayList;
 import java.util.List;

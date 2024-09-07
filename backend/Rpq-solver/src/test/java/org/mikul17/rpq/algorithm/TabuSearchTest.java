@@ -26,7 +26,7 @@ public class TabuSearchTest {
                 .tabuListSize(40)
                 .tasks(firstTestCase)
                 .build();
-        TabuSearchSolution result = ts.solve(p);
+        TabuSearchSolution result = ts.solve(p, solution -> {});
 
         Assertions.assertThat(result.getBestCmax()).isLessThan(firstTestCaseWorstCmax);
         Assertions.assertThat(result.getBestCmax()).isLessThanOrEqualTo(firstTestCaseAcceptableCmax);
@@ -41,7 +41,7 @@ public class TabuSearchTest {
                 .tabuListSize(40)
                 .tasks(secondTestCase)
                 .build();
-        TabuSearchSolution result = ts.solve(p);
+        TabuSearchSolution result = ts.solve(p, solution -> {});
 
         Assertions.assertThat(result.getBestCmax()).isLessThan(secondTestCaseWorstCmax);
         Assertions.assertThat(result.getBestCmax()).isLessThanOrEqualTo(secondTestCaseAcceptableCmax);
@@ -56,7 +56,7 @@ public class TabuSearchTest {
                 .tabuListSize(40)
                 .tasks(thirdTestCase)
                 .build();
-        TabuSearchSolution result = ts.solve(p);
+        TabuSearchSolution result = ts.solve(p, solution -> {});
 
         Assertions.assertThat(result.getBestCmax()).isLessThan(thirdTestCaseWorstCmax);
         Assertions.assertThat(result.getBestCmax()).isLessThanOrEqualTo(thirdTestCaseAcceptableCmax);
@@ -71,7 +71,7 @@ public class TabuSearchTest {
                 .tabuListSize(40)
                 .tasks(fourthTestCase)
                 .build();
-        TabuSearchSolution result = ts.solve(p);
+        TabuSearchSolution result = ts.solve(p, solution -> {});
 
         Assertions.assertThat(result.getBestCmax()).isLessThan(fourthTestCaseWorstCmax);
         Assertions.assertThat(result.getBestCmax()).isLessThanOrEqualTo(fourthTestCaseAcceptableCmax);

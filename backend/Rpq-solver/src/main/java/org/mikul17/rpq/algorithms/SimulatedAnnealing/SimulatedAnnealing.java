@@ -1,20 +1,23 @@
 package org.mikul17.rpq.algorithms.SimulatedAnnealing;
 
-import org.mikul17.rpq.common.Permutation;
-import org.mikul17.rpq.common.Solver;
-import org.mikul17.rpq.common.Task;
+import org.mikul17.rpq.algorithms.common.Permutation;
+import org.mikul17.rpq.algorithms.common.Solver;
+import org.mikul17.rpq.algorithms.common.Task;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 
+@Component
 public class SimulatedAnnealing
         implements Solver<SimulatedAnnealingParameters, SimulatedAnnealingSolution> {
     private final Random random = new Random();
 
     @Override
-    public SimulatedAnnealingSolution solve (SimulatedAnnealingParameters parameters) {
+    public SimulatedAnnealingSolution solve (SimulatedAnnealingParameters parameters, Consumer<SimulatedAnnealingSolution> solutionConsumer) {
         SimulatedAnnealingSolution solution = new SimulatedAnnealingSolution();
         long startTime = System.nanoTime();
 
@@ -49,6 +52,7 @@ public class SimulatedAnnealing
             }
             currentTemperature *= parameters.coolingRate;
             solution.addTemperature(currentTemperature);
+            solutionConsumer.accept(solution);
         }
         long endTime = System.nanoTime();
         long duration = endTime - startTime;

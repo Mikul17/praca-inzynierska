@@ -1,4 +1,4 @@
-package org.mikul17.rpq.common;
+package org.mikul17.rpq.algorithms.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
