@@ -1,7 +1,9 @@
 package org.mikul17.rpq.algorithms.TabuSearch;
 
 import lombok.experimental.SuperBuilder;
-import org.mikul17.rpq.common.SolverParameters;
+import org.mikul17.rpq.algorithms.common.SolverParameters;
+
+import java.util.Map;
 
 /**
  * Class representing parameters for TabuSearch algorithm
@@ -14,4 +16,10 @@ import org.mikul17.rpq.common.SolverParameters;
 public class TabuSearchParameters extends SolverParameters {
     protected int maxIterations;
     protected int tabuListSize;
+
+    @Override
+    public void fromMap (Map<String, Object> map) {
+        maxIterations = (int) map.get("maxIterations");
+        tabuListSize = (int) map.get("tabuListSize");
+    }
 }

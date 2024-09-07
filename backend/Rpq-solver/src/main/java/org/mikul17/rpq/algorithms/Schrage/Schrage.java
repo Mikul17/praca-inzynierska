@@ -1,16 +1,17 @@
 package org.mikul17.rpq.algorithms.Schrage;
 
-import org.mikul17.rpq.common.Permutation;
-import org.mikul17.rpq.common.Solver;
-import org.mikul17.rpq.common.Task;
+import org.mikul17.rpq.algorithms.common.Permutation;
+import org.mikul17.rpq.algorithms.common.Solver;
+import org.mikul17.rpq.algorithms.common.Task;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import java.util.function.Consumer;
 
 public class Schrage implements Solver<SchrageParameters, SchrageSolution> {
 
     @Override
-    public SchrageSolution solve (SchrageParameters parameters) {
+    public SchrageSolution solve (SchrageParameters parameters, Consumer<SchrageSolution> solutionConsumer) {
         SchrageSolution solution = new SchrageSolution();
 
         PriorityQueue<Task> readyQueue = new PriorityQueue<>(

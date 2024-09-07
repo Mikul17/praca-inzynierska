@@ -28,7 +28,7 @@ public class SimulatedAnnealingTest {
                 .maxIterations(1_000_000)
                 .tasks(firstTestCase)
                 .build();
-        SimulatedAnnealingSolution result = sa.solve(p);
+        SimulatedAnnealingSolution result = sa.solve(p, solution -> {});
 
         Assertions.assertThat(result.getBestCmax()).isLessThan(firstTestCaseWorstCmax);
         Assertions.assertThat(result.getBestCmax()).isLessThanOrEqualTo(firstTestCaseAcceptableCmax);
@@ -44,7 +44,7 @@ public class SimulatedAnnealingTest {
                 .maxIterations(1_000_000)
                 .tasks(secondTestCase)
                 .build();
-        SimulatedAnnealingSolution result = sa.solve(p);
+        SimulatedAnnealingSolution result = sa.solve(p, solution -> {});
 
         Assertions.assertThat(result.getBestCmax()).isLessThan(secondTestCaseWorstCmax);
         Assertions.assertThat(result.getBestCmax()).isLessThanOrEqualTo(secondTestCaseAcceptableCmax);
@@ -60,7 +60,7 @@ public class SimulatedAnnealingTest {
                 .maxIterations(1_000_000)
                 .tasks(thirdTestCase)
                 .build();
-        SimulatedAnnealingSolution result = sa.solve(p);
+        SimulatedAnnealingSolution result = sa.solve(p, solution -> {});
 
         Assertions.assertThat(result.getBestCmax()).isLessThan(thirdTestCaseWorstCmax);
         Assertions.assertThat(result.getBestCmax()).isLessThanOrEqualTo(thirdTestCaseAcceptableCmax);
@@ -76,7 +76,7 @@ public class SimulatedAnnealingTest {
                 .maxIterations(1_000_000)
                 .tasks(fourthTestCase)
                 .build();
-        SimulatedAnnealingSolution result = sa.solve(p);
+        SimulatedAnnealingSolution result = sa.solve(p, solution -> {});
 
         Assertions.assertThat(result.getBestCmax()).isLessThan(fourthTestCaseWorstCmax);
         Assertions.assertThat(result.getBestCmax()).isLessThanOrEqualTo(fourthTestCaseAcceptableCmax);
@@ -92,7 +92,7 @@ public class SimulatedAnnealingTest {
                 .maxIterations(100)
                 .tasks(firstTestCase)
                 .build();
-        SimulatedAnnealingSolution result = sa.solve(p);
+        SimulatedAnnealingSolution result = sa.solve(p, solution -> {});
 
         Assertions.assertThat(result.getTemperature().getFirst()).isGreaterThan(result.getTemperature().getLast());
     }

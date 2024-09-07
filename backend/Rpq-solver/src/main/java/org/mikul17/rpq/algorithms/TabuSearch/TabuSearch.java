@@ -1,13 +1,14 @@
 package org.mikul17.rpq.algorithms.TabuSearch;
 
 import lombok.Builder;
-import org.mikul17.rpq.common.Permutation;
-import org.mikul17.rpq.common.Solver;
-import org.mikul17.rpq.common.Task;
+import org.mikul17.rpq.algorithms.common.Permutation;
+import org.mikul17.rpq.algorithms.common.Solver;
+import org.mikul17.rpq.algorithms.common.Task;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Class that represents Tabu Search algorithm.
@@ -28,7 +29,7 @@ public class TabuSearch implements Solver<TabuSearchParameters, TabuSearchSoluti
      * @see TabuSearchSolution
      */
     @Override
-    public TabuSearchSolution solve (TabuSearchParameters parameters) {
+    public TabuSearchSolution solve (TabuSearchParameters parameters, Consumer<TabuSearchSolution> solutionConsumer) {
         TabuSearchSolution solution = new TabuSearchSolution();
         long startTime = System.nanoTime();
 

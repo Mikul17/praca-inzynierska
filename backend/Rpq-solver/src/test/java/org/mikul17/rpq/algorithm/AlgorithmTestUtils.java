@@ -1,6 +1,6 @@
 package org.mikul17.rpq.algorithm;
 
-import org.mikul17.rpq.common.Task;
+import org.mikul17.rpq.algorithms.common.Task;
 
 import java.util.List;
 
