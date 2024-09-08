@@ -18,7 +18,7 @@ export default function AlgorithmSelector() {
       }}
       size="lg"
       placeholder="Select an algorithm"
-      value={currentAlgorithm}
+      selectedKeys={currentAlgorithm ? [currentAlgorithm] : []}
       onChange={(e) => setCurrentAlgorithm(e.target.value as AlgorithmTypeKeys)}
       aria-label="Select an algorithm"
       disabledKeys={[currentAlgorithm]}

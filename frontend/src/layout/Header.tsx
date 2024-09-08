@@ -1,13 +1,13 @@
 "use client";
 import AlgorithmSelector from "@/components/AlgorithmSelector";
-import { Button } from "@nextui-org/button";
+import StartButton from "@/components/StartButton";
 
 export default function Header() {
 
     return (
-        <div className="flex gap-3">
+        <div className="flex gap-4 pb-4">
             <AlgorithmSelector />
-            <Button size="lg">Start</Button>
+            <StartButton />
         </div>
     )
 }
