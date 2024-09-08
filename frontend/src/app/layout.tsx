@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Roboto_Mono } from "next/font/google";
 import "./globals.css";
-import { NextUIProvider } from "@nextui-org/react";
-import { MainProvider } from "./providers/MainProvider";
+import { MainProvider } from "../providers/MainProvider";
 
 const robotoMono = Roboto_Mono({
   subsets: ["latin"],
