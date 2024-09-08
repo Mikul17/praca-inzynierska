@@ -11,9 +11,9 @@ export default function AlgorithmSelector() {
 
   return (
     <Select<typeof AlgorithmType>
-      className="w-64 !   rounded-l-none !rounded-r-s"
+      className="w-64 !rounded-l-none !rounded-r-s"
       classNames={{
-        trigger: "!rounded-l-none !rounded-r-2xl text-black",
+        trigger: "!rounded-l-none !rounded-r-2xl text-black shadow-outer-shadow",
         spinner: "text-black",
       }}
       size="lg"
