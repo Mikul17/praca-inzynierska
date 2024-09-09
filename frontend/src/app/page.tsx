@@ -12,10 +12,15 @@ export default function Home() {
   const headerHeight = 48;
   const footerHeight = 48;
   const gapHeight = 16;
-  const pageContentHeight = height - headerHeight - footerHeight - gapHeight * 2;
+  const pageContentHeight = Math.max(800 - headerHeight - footerHeight - gapHeight * 2, height - headerHeight - footerHeight - gapHeight * 2);
 
   return (
-    <main className={`w-${width} h-[${height}] overflow-hi min-w-[800px] min-h-[600px]`}>
+    <main style={{
+      width: '100%',
+      minWidth: '1000px',
+      height: '100%',
+      minHeight: '800px',
+    }}>
       <Header height={headerHeight}/>
       <Gap height={gapHeight}/>
       <PageContent height={pageContentHeight}/>
