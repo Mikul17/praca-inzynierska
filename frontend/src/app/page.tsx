@@ -1,18 +1,26 @@
 "use client";
 
+import useWindowSize from "@/hooks/WindowSizeContext";
+import Footer from "@/layout/Footer";
+import Gap from "@/layout/Gap";
 import Header from "@/layout/Header";
 import PageContent from "@/layout/PageContent";
 
 
 export default function Home() {
+  const {width, height} = useWindowSize();
+  const headerHeight = 48;
+  const footerHeight = 48;
+  const gapHeight = 16;
+  const pageContentHeight = height - headerHeight - footerHeight - gapHeight * 2;
+
   return (
-    <main className="w-screen h-screen overflow-hi">
-      <Header/>
-      <div className="flex justify-center items-center flex-col bg-neutral-700">
-        <h1 className="text-4xl font-bold">Welcome to the Sorting Visualizer</h1>
-        <h2 className="text-2xl">No data provided</h2>
-      </div>
-      <PageContent/>
+    <main className={`w-${width} h-[${height}] overflow-hi min-w-[800px] min-h-[600px]`}>
+      <Header height={headerHeight}/>
+      <Gap height={gapHeight}/>
+      <PageContent height={pageContentHeight}/>
+      <Gap height={gapHeight}/>
+      <Footer height={footerHeight}/>
     </main>
   );
 }
