@@ -23,6 +23,8 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loadFile = useCallback(async (file: File) => {
     const reader = new FileReader();
 
+    console.log('Loading file:', file.name);
+
     reader.onload = (event) => {
       const content = event.target?.result as string;
       const lines = content.split('\n');
@@ -34,6 +36,7 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     reader.readAsText(file);
+    console.log('File loaded:', file.name);
   }, []);
 
   const sendFileToBackend = useCallback(async () => {
