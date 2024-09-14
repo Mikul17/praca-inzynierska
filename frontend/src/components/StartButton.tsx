@@ -18,7 +18,7 @@ export default function StartButton() {
         <Icon name="play" size={20} color="currentColor" /> : 
         <Icon name="file" size={20} color="currentColor" />
       }
-      className="shadow-outer-shadow"
+      className="shadow-outer-shadow bg-defaultContent hover:bg-primary"
       size="lg"
       isDisabled={!isFileLoaded}
       onMouseEnter={() => setIsHovered(true)}
