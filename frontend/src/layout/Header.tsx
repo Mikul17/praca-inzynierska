@@ -1,18 +1,30 @@
 "use client";
 import AlgorithmSelector from "@/components/AlgorithmSelector";
 import StartButton from "@/components/StartButton";
+import { useFile } from "@/hooks/FileContext";
+import { Input } from "@nextui-org/react";
 
 interface HeaderProps {
-    height: number | string;
+  height: number | string;
 }
 
 export default function Header({ height }: HeaderProps) {
+  const { fileName } = useFile();
+  
+
   return (
-    <div className={`flex gap-4`} style={{ height }}>
-      <AlgorithmSelector />
-      <StartButton />
+    <div className={`flex justify-between`} style={{ height }}>
+      <div className="flex gap-4">
+        <AlgorithmSelector />
+        <StartButton />
+      </div>
+      <div className="flex justify-center items-center bg-primary p-4 h-[48px] shadow-outer-shadow" style={{borderRadius:"1rem 0 0 1rem", maxWidth:"30rem"}}>
+          {fileName ? (
+            <span className="text-2xl truncate ">File: {fileName}</span>
+          ) : (
+            <span className="text-2xl">No file selected</span>
+          )}
+    </div>
     </div>
   );
-};
-
-
+}

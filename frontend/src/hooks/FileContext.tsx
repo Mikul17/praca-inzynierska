@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useCallback, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 interface FileContextType {
   isFileLoaded: boolean;
@@ -20,10 +20,27 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [fileName, setFileName] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
+  useEffect(() => {
+    const storedIsFileLoaded = sessionStorage.getItem('isFileLoaded');
+    const storedFileData = sessionStorage.getItem('fileData');
+    const storedFileName = sessionStorage.getItem('fileName');
+
+    if (storedIsFileLoaded && storedFileData && storedFileName) {
+      setIsFileLoaded(JSON.parse(storedIsFileLoaded));
+      setFileData(JSON.parse(storedFileData));
+      setFileName(storedFileName);
+    }
+  }, []);
+
+  useEffect(() => {
+    sessionStorage.setItem('isFileLoaded', JSON.stringify(isFileLoaded));
+    sessionStorage.setItem('fileData', JSON.stringify(fileData));
+    sessionStorage.setItem('fileName', fileName || '');
+  }, [isFileLoaded, fileData, fileName]);
+
+
   const loadFile = useCallback(async (file: File) => {
     const reader = new FileReader();
-
-    console.log('Loading file:', file.name);
 
     reader.onload = (event) => {
       const content = event.target?.result as string;
@@ -36,7 +53,6 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     reader.readAsText(file);
-    console.log('File loaded:', file.name);
   }, []);
 
   const sendFileToBackend = useCallback(async () => {
