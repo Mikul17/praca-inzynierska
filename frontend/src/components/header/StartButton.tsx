@@ -1,7 +1,7 @@
 import { Button } from "@nextui-org/button";
-import Icon from "./Icon";
 import { useEffect, useState } from "react";
 import { useFile } from "@/hooks/FileContext";
+import Icon from "../Icon";
 
 export default function StartButton() {
   const [isHovered, setIsHovered] = useState<boolean>(false);

@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { DropEvent, FileRejection, useDropzone } from "react-dropzone";
-import Icon from "./Icon";
+import Icon from "../Icon";
 import toast from 'react-hot-toast';
 import { useFile } from "@/hooks/FileContext";
 

@@ -1,10 +1,5 @@
+import { useAlgorithm, AlgorithmType, AlgorithmTypeKeys, AlgorithmDisplayNames } from "@/hooks/AlgorithmContext";
 import { Select, SelectItem } from "@nextui-org/select";
-import {
-  useAlgorithm,
-  AlgorithmType,
-  AlgorithmDisplayNames,
-  AlgorithmTypeKeys,
-} from "../hooks/AlgorithmContext";
 
 export default function AlgorithmSelector() {
   const { currentAlgorithm, setCurrentAlgorithm } = useAlgorithm();

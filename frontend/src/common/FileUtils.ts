@@ -1,5 +1,7 @@
 import { Task } from "./types";
 
+export const ALLOWED_FILE_FORMATS : Array<string> = ["csv","txt"];
+
 export const convertTasksToFile = (tasks: Task[], format: "csv" | "txt" = "csv"): File => {
   let content: string;
   let mimeType: string;
