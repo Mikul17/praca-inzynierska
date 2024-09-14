@@ -4,17 +4,17 @@ import {
   AlgorithmType,
   AlgorithmDisplayNames,
   AlgorithmTypeKeys,
-} from "../providers/context/AlgorithmContext";
+} from "../hooks/AlgorithmContext";
 
 export default function AlgorithmSelector() {
   const { currentAlgorithm, setCurrentAlgorithm } = useAlgorithm();
 
   return (
     <Select<typeof AlgorithmType>
-      className="w-64 !   rounded-l-none !rounded-r-s"
+      className="w-64"
       classNames={{
-        trigger: "!rounded-l-none !rounded-r-2xl text-black",
-        spinner: "text-black",
+        base: "!rounded-l-none !rounded-r-2xl shadow-outer-shadow",
+        trigger: "!rounded-l-none text-black",
       }}
       size="lg"
       placeholder="Select an algorithm"

@@ -4,23 +4,33 @@
 
 @layer base {
   html, body {
-    @apply overflow-x-hidden min-h-screen;
+    @apply overflow-auto;
+    min-width: 1000px;
+    min-height: 800px;
   }
 }
 
 :root {
-  --background: #D9D9D9;
+  --background: #FAf9F6;
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
     --background: #0a0a0a;
     --foreground: #D9D9D9;
   }
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #FAf9F6;
+    --foreground: #171717;
+  }
+}
+ 
+
 body {
   color: var(--foreground);
   background: var(--background);
-}
+} 

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Roboto_Mono } from "next/font/google";
 import "./globals.css";
-import { MainProvider } from "../providers/MainProvider";
+import { MainProvider } from "../hooks/MainProvider";
+import { Toaster } from "react-hot-toast";
 
 const robotoMono = Roboto_Mono({
   subsets: ["latin"],
@@ -21,7 +22,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${robotoMono.variable} font-mono antialiased`}>
-        <MainProvider>{children}</MainProvider>
+        <MainProvider>
+          <Toaster position="bottom-center" />
+          {children}
+          </MainProvider>
       </body>
     </html>
   );

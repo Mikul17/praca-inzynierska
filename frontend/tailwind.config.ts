@@ -13,6 +13,17 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        primary: "#d9d9d9",
+        defaultContent: "#f4f4f5",
+      },
+      boxShadow: {
+        "outer-shadow": "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+      },
+      borderWidth: {
+        3: '3px',
+      },
+      borderStyle: {
+        dashed: 'dashed',
       },
     },
   },

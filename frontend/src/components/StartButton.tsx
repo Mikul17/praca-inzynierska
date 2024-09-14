@@ -1,8 +1,7 @@
 import { Button } from "@nextui-org/button";
 import Icon from "./Icon";
 import { useEffect, useState } from "react";
-import { useFile } from "@/providers/context/FileContext";
-import { Spinner } from "@nextui-org/react";
+import { useFile } from "@/hooks/FileContext";
 
 export default function StartButton() {
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -19,8 +18,8 @@ export default function StartButton() {
         <Icon name="play" size={20} color="currentColor" /> : 
         <Icon name="file" size={20} color="currentColor" />
       }
+      className="shadow-outer-shadow bg-defaultContent hover:bg-primary"
       size="lg"
-      spinner={<Spinner color="white" />}
       isDisabled={!isFileLoaded}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
