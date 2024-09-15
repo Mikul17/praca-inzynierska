@@ -1,10 +1,10 @@
 import { Button } from "@nextui-org/button";
-import FileDropzone from "@/components/FileDropzone";
 import Gap from "./Gap";
 import { useFile } from "@/hooks/FileContext";
-import { Divider, Tooltip } from "@nextui-org/react";
-import TooltipContent from "@/components/TooltipInformation";
+import { Tooltip } from "@nextui-org/react";
+import TooltipContent from "@/components/content/TooltipInformation";
 import Icon from "@/components/Icon";
+import FileDropzone from "@/components/content/FileDropzone";
 
 interface PageContentProps {
   height: number | string;

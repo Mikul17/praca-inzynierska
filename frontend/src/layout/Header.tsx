@@ -1,8 +1,8 @@
 "use client";
-import AlgorithmSelector from "@/components/AlgorithmSelector";
-import StartButton from "@/components/StartButton";
+
+import AlgorithmSelector from "@/components/header/AlgorithmSelector";
+import StartButton from "@/components/header/StartButton";
 import { useFile } from "@/hooks/FileContext";
-import { Input } from "@nextui-org/react";
 
 interface HeaderProps {
   height: number | string;
