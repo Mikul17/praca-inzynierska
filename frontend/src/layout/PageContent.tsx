@@ -11,7 +11,7 @@ interface PageContentProps {
 }
 
 export default function PageContent({ height }: PageContentProps) {
-  const { fileTasks, generateSampleTasks } = useFile();
+  const { generateSampleTasks } = useFile();
 
   const handleDataGeneration = () => {
     generateSampleTasks(100);
@@ -40,9 +40,9 @@ export default function PageContent({ height }: PageContentProps) {
           >
             Generate sample data
           </Button>
-          <Gap height={32} />
+          <Gap size={32} />
           <p className="text-3xl">Or</p>
-          <Gap height={32} />
+          <Gap size={32} />
           <FileDropzone />
         </div>
       </div>
