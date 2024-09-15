@@ -2,19 +2,34 @@ import { Task } from "./types";
 
 export const ALLOWED_FILE_FORMATS : Array<string> = ["csv","txt"];
 
-export const convertTasksToFile = (tasks: Task[], format: "csv" | "txt" = "csv"): File => {
+
+export const convertTasksToFile = (format: "csv" | "txt" = "csv", orderOnly: boolean): File | null => {
+  const storedTasks = sessionStorage.getItem('fileTasks');
+  const storedFileName = sessionStorage.getItem('fileName');
+
+  if (!storedTasks || !storedFileName) {
+    console.error('No tasks or filename found in sessionStorage');
+    return null;
+  }
+
+  const tasks: Task[] = JSON.parse(storedTasks);
   let content: string;
   let mimeType: string;
   let fileName: string;
 
-  content = tasks.map((task) => `${task.id},${task.r},${task.p},${task.q}`).join("\n");
+  if(orderOnly){
+    content = tasks.map((task) => `${task.id}`).join(",");
+  }else{
+    content = tasks.map((task) => `${task.id},${task.r},${task.p},${task.q}`).join("\n");
+  }
+
 
   if (format === "csv") {
     mimeType = "text/csv";
-    fileName = "tasks.csv";
+    fileName = storedFileName.endsWith('.csv') ? storedFileName : `${storedFileName}.csv`;
   } else {
     mimeType = "text/plain";
-    fileName = "tasks.txt";
+    fileName = storedFileName.endsWith('.txt') ? storedFileName : `${storedFileName}.txt`;
   }
 
   const blob = new Blob([content], { type: mimeType });

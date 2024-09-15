@@ -8,7 +8,7 @@ import PageContent from "@/layout/PageContent";
 import { Spinner } from "@nextui-org/spinner";
 
 export default function Home() {
-  const { width, height, isReady } = useWindowSize();
+  const { height, isReady } = useWindowSize();
   const headerHeight = 48;
   const footerHeight = 48;
   const gapHeight = 16;
@@ -35,9 +35,9 @@ export default function Home() {
       }}
     >
       <Header height={headerHeight} />
-      <Gap height={gapHeight} />
+      <Gap size={gapHeight} />
       <PageContent height={pageContentHeight} />
-      <Gap height={gapHeight} />
+      <Gap size={gapHeight} />
       <Footer height={footerHeight} />
     </main>
   );

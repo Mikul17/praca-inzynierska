@@ -13,6 +13,7 @@ interface FileContextType {
   loadSampleData: (tasks: Task[]) => void;
   isUploading: boolean;
   generateSampleTasks: (size: number) => void;
+  downloadFile: (format: "csv" | "txt", orderOnly: boolean) => void;
 }
 
 const FileContext = createContext<FileContextType | undefined>(undefined);
@@ -90,7 +91,7 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     loadSampleData(tasks)
 }
-
+ /* TODO - modify this function and test it with backend*/
   const sendFileToBackend = useCallback(async () => {
     if (!isFileLoaded || !fileTasks) {
       throw new Error('No file loaded');
@@ -99,7 +100,7 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsUploading(true);
 
     try {
-      const csvContent = convertTasksToFile(fileTasks);
+      const csvContent = fileTasks;
       const response = await fetch('/api/upload', {
         method: 'POST',
         headers: {
@@ -120,10 +121,27 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [isFileLoaded, fileTasks, fileName]);
 
+  const downloadFile = useCallback((format: "csv" | "txt", orderOnly: boolean) => {
+    const file = convertTasksToFile(format, orderOnly);
+    if (file) {
+      const url = URL.createObjectURL(file);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success(`Plik ${file.name} został pobrany`);
+    } else {
+      toast.error('Nie udało się wygenerować pliku');
+    }
+  }, []);
+
 
 
   return (
-    <FileContext.Provider value={{ isFileLoaded, fileTasks, fileName, loadFile, sendFileToBackend, isUploading, loadSampleData, generateSampleTasks }}>
+    <FileContext.Provider value={{ isFileLoaded, fileTasks, fileName, loadFile, sendFileToBackend, isUploading, loadSampleData, generateSampleTasks, downloadFile }}>
       {children}
     </FileContext.Provider>
   );
