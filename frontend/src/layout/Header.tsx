@@ -10,7 +10,6 @@ interface HeaderProps {
 
 export default function Header({ height }: HeaderProps) {
   const { fileName } = useFile();
-  
 
   return (
     <div className={`flex justify-between`} style={{ height }}>
@@ -18,13 +17,16 @@ export default function Header({ height }: HeaderProps) {
         <AlgorithmSelector />
         <StartButton />
       </div>
-      <div className="flex justify-center items-center bg-secondary p-4 h-[48px] shadow-outer-shadow" style={{borderRadius:"1rem 0 0 1rem", maxWidth:"30rem"}}>
-          {fileName ? (
-            <span className="text-2xl truncate ">File: {fileName}</span>
-          ) : (
-            <span className="text-2xl">No file selected</span>
-          )}
-    </div>
+      <div
+        className="flex justify-center items-center bg-secondary p-4 h-[48px] shadow-outer-shadow"
+        style={{ borderRadius: "1rem 0 0 1rem", maxWidth: "30rem" }}
+      >
+        {fileName ? (
+          <span className="text-2xl truncate ">File: {fileName}</span>
+        ) : (
+          <span className="text-2xl">No file selected</span>
+        )}
+      </div>
     </div>
   );
 }

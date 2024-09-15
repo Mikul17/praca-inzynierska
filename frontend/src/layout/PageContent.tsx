@@ -18,10 +18,13 @@ export default function PageContent({ height }: PageContentProps) {
   };
 
   return (
-    <div className="flex justify-center items-center flex-col" style={{ height }}>
+    <div
+      className="flex justify-center items-center flex-col"
+      style={{ height }}
+    >
       <div
         className="flex flex-col shadow-outer-shadow bg-primary relative"
-        style={{ borderRadius: "16px"}}
+        style={{ borderRadius: "16px" }}
       >
         <div className="absolute top-0 right-0 p-2">
           <Tooltip content={<TooltipContent />}>
@@ -30,8 +33,11 @@ export default function PageContent({ height }: PageContentProps) {
             </div>
           </Tooltip>
         </div>
-        
-        <div className="flex flex-col justify-between items-center" style={{ padding: "60px"}}>
+
+        <div
+          className="flex flex-col justify-between items-center"
+          style={{ padding: "60px" }}
+        >
           <Button
             size="lg"
             className="text-3xl bg-primary shadow-outer-shadow"
@@ -50,7 +56,6 @@ export default function PageContent({ height }: PageContentProps) {
   );
 }
 
-
 /*Old design, keep just in case */
 //   return (
 //     <div className={`flex justify-center items-center flex-col`} style={{ height }}>
@@ -65,8 +70,7 @@ export default function PageContent({ height }: PageContentProps) {
 //             </div>
 //           </Tooltip>
 //           </div>
-         
-          
+
 //           <div className="flex flex-col justify-between items-center" style={{ padding: "60px", paddingTop: "10px"}}>
 //           <Button
 //             size="lg"
@@ -81,7 +85,7 @@ export default function PageContent({ height }: PageContentProps) {
 //           <Gap height={32} />
 //           <FileDropzone />
 //           </div>
-         
+
 //         </div>
 //     </div>
 //   );

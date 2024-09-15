@@ -1,15 +1,17 @@
 import { ALLOWED_FILE_FORMATS } from "@/common/FileUtils";
 import { SelectItem } from "@nextui-org/react";
 import { Select } from "@nextui-org/select";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 
 interface FormatDropdownProps {
-  readonly selectedFormat : string | undefined,
+  readonly selectedFormat: string | undefined;
   setSelectedFormat: Dispatch<SetStateAction<string | undefined>>;
 }
 
-export default function FormatDropdown({selectedFormat, setSelectedFormat}:FormatDropdownProps) {
-  
+export default function FormatDropdown({
+  selectedFormat,
+  setSelectedFormat,
+}: FormatDropdownProps) {
   return (
     <Select
       className="w-24"
