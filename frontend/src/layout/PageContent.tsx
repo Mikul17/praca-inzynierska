@@ -1,7 +1,7 @@
 import { Button } from "@nextui-org/button";
 import Gap from "./Gap";
 import { useFile } from "@/hooks/FileContext";
-import { Divider, Tooltip } from "@nextui-org/react";
+import { Tooltip } from "@nextui-org/react";
 import TooltipContent from "@/components/content/TooltipInformation";
 import Icon from "@/components/Icon";
 import FileDropzone from "@/components/content/FileDropzone";

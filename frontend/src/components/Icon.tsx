@@ -18,7 +18,7 @@ const Icon: React.FC<IconProps> = ({ name, size = 24, color = 'currentColor' }) 
   const IconComponent = useMemo(() => {
     return dynamic<SVGProps>(() => import(`@/icons/${name}Icon.svg`), {
       loading: () => <Spinner color="white" aria-label="Loading..."/>,
-      ssr: false,
+      ssr: true,
     });
   }, [name]);
 
