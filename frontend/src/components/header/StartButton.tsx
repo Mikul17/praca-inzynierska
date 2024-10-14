@@ -1,6 +1,6 @@
 import { Button } from "@nextui-org/button";
 import { useEffect, useState } from "react";
-import { useFile } from "@/hooks/FileContext";
+import { useFile } from "@/context/FileContext";
 import Icon from "../Icon";
 
 export default function StartButton() {

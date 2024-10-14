@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Roboto_Mono } from "next/font/google";
 import "./globals.css";
-import { MainProvider } from "../hooks/MainProvider";
 import { Toaster } from "react-hot-toast";
+import { MainProvider } from "@/context/MainProvider";
 
 const robotoMono = Roboto_Mono({
   subsets: ["latin"],

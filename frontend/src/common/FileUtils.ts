@@ -38,7 +38,7 @@ export const convertTasksToFile = (format: "csv" | "txt" = "csv", orderOnly: boo
 
 export const extractTaskFromFile = (fileContent: string): Task[] => {
   const lines = fileContent.split("\n");
-  let counter = 0;
+  let counter = 1;
   return lines
     .map((line) => {
       const [r, p, q] = line.split(",");
