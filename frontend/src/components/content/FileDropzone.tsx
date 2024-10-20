@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { DropEvent, FileRejection, useDropzone } from "react-dropzone";
 import Icon from "../Icon";
 import toast from 'react-hot-toast';
-import { useFile } from "@/hooks/FileContext";
+import { useFile } from "@/context/FileContext";
 
 export default function FileDropzone() {
   const { loadFile } = useFile();
@@ -10,6 +10,10 @@ export default function FileDropzone() {
 
   const onDrop = useCallback((acceptedFiles: File[], fileRejections: FileRejection[], event: DropEvent) => {
     if (acceptedFiles.length > 0) {
+      if(acceptedFiles[0].size > 1024 * 1024 * 10) {
+        toast.error('File size is too large! Maximum file size is 10MB.');
+        return;
+      }
       const file = acceptedFiles[0];
       loadFile(file);
       toast.success('File uploaded successfully!');

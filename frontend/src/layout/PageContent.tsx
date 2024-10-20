@@ -1,21 +1,58 @@
+"use client";
 import { Button } from "@nextui-org/button";
-import Gap from "./Gap";
-import { useFile } from "@/hooks/FileContext";
-import { Tooltip } from "@nextui-org/react";
+import { Input, Tooltip } from "@nextui-org/react";
+import dynamic from "next/dynamic";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { useTaskContext } from "@/context/TaskContext";
+import FileDropzone from "@/components/content/FileDropzone";
 import TooltipContent from "@/components/content/TooltipInformation";
 import Icon from "@/components/Icon";
-import FileDropzone from "@/components/content/FileDropzone";
+import Gap from "./Gap";
+import { useFile } from "@/context/FileContext";
 
 interface PageContentProps {
   height: number | string;
 }
 
-export default function PageContent({ height }: PageContentProps) {
-  const { generateSampleTasks } = useFile();
+// Dynamiczny import z wyłączonym SSR
+const GanttChart = dynamic(() => import("../components/content/GanttChart"), {
+  ssr: false,
+});
 
-  const handleDataGeneration = () => {
-    generateSampleTasks(100);
+export default function PageContent({ height }: PageContentProps) {
+  const { tasks, setOrder, validateOrder } = useTaskContext();
+  const { generateSampleTasks } = useFile();
+  const [inputValue, setInputValue] = useState("");
+
+  const updateChart = () => {
+    const order = inputValue
+      .trim()
+      .split(",")
+      .map((idStr) => parseInt(idStr, 10))
+      .filter((id) => !isNaN(id));
+      console.log(order)
+    if(!validateOrder(order)){
+      return;
+    }
+    setOrder(order);
   };
+
+  const handleGenerateSampleData = () => {
+    generateSampleTasks(50);
+  }
+
+  // return (
+  //   <div style={{ width: "1000px" }}>
+  //     <Input
+  //       placeholder="Wpisz kolejność zadań (np. 1 2 3)"
+  //       value={inputValue}
+  //       onChange={(e) => setInputValue(e.target.value)}
+  //       width="300px"
+  //     />
+  //     <GanttChart />
+  //   </div>
+  // );
 
   return (
     <div
@@ -42,7 +79,7 @@ export default function PageContent({ height }: PageContentProps) {
             size="lg"
             className="text-3xl bg-primary shadow-outer-shadow"
             style={{ border: "solid 1px black" }}
-            onClick={handleDataGeneration}
+            onClick={handleGenerateSampleData}
           >
             Generate sample data
           </Button>

@@ -4,7 +4,7 @@ import { Button } from "@nextui-org/button";
 import Gap from "./Gap";
 import { Checkbox } from "@nextui-org/react";
 import { useState } from "react";
-import { useFile } from "@/hooks/FileContext";
+import { useFile } from "@/context/FileContext";
 
 interface FooterProps {
   height: number | string;

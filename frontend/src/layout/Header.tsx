@@ -2,7 +2,7 @@
 
 import AlgorithmSelector from "@/components/header/AlgorithmSelector";
 import StartButton from "@/components/header/StartButton";
-import { useFile } from "@/hooks/FileContext";
+import { useFile } from "@/context/FileContext";
 
 interface HeaderProps {
   height: number | string;

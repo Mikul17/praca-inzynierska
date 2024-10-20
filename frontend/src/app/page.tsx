@@ -1,6 +1,6 @@
 "use client";
 
-import useWindowSize from "@/hooks/WindowSizeContext";
+import useWindowSize from "@/context/WindowSizeContext";
 import Footer from "@/layout/Footer";
 import Gap from "@/layout/Gap";
 import Header from "@/layout/Header";
