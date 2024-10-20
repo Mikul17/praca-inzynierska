@@ -7,13 +7,13 @@ import { useTaskContext } from '@/context/TaskContext';
 interface GanttChartProps {
 }
 
-const taskStyle = (task: Task) => `
-  color: white;
-  font:bold;
+const taskStyle = (isRecentlyChanged: boolean) => `
+  color:  ${isRecentlyChanged ? '#f4f4f5' : 'black'};
   border: none;
   border-radius: 8px;
-  background-color: ${task.recentlyChanged ? '#1DB954' : ''};
-`
+  background-color: ${isRecentlyChanged ? '#1DB954' : '#d9d9d9'};
+  transition: background-color 0.3s ease;
+`;
 
 const GanttChart: React.FC<GanttChartProps> = ({
 }) => {
@@ -21,7 +21,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
   const timelineRef = useRef<any>(null);
   const itemsRef = useRef<any>(null);
   const groupsRef = useRef<any>(null);
-  const { getTasksFromCurrentOrder } = useTaskContext();
+  const { getTasksFromCurrentOrder, recentlyChangedTasks } = useTaskContext();
   const tasks = getTasksFromCurrentOrder() ?? [];
 
   const computeSchedule = (tasks: Task[]): Task[] => {
@@ -35,22 +35,21 @@ const GanttChart: React.FC<GanttChartProps> = ({
         ...task,
         actualStart: start,
         actualEnd: end,
-        recentlyChanged: false
+
       };
     });
   };
 
   const mapTasksToTimelineItems = (tasks: Task[]) => {
     return new DataSet(
-      tasks.map(task => ({
+      tasks.map((task) => ({
         id: task.id,
         content: `Task ${task.id}`,
         start: task.actualStart,
         end: task.actualEnd,
         group: task.id,
         title: `R: ${task.r}, P: ${task.p}, Q: ${task.q}`,
-        recentlyChanged: task.recentlyChanged,
-        style: taskStyle(task),
+        style: taskStyle(recentlyChangedTasks.has(task.id)),
       }))
     );
   };
@@ -107,7 +106,8 @@ const GanttChart: React.FC<GanttChartProps> = ({
           majorLabels: {
             millisecond: '', second: '', minute: '', hour: '', weekday: '', day: '', month: '', year: ''
           }
-        }
+        },
+
       };
 
       if (!timelineRef.current) {
@@ -130,8 +130,10 @@ const GanttChart: React.FC<GanttChartProps> = ({
         groupsRef.current.clear();
         groupsRef.current.add(newGroups.get());
       }
+
+      timelineRef.current.fit(true)
     }
-  }, [tasks]);
+  }, [tasks, recentlyChangedTasks]);
 
   return <div ref={containerRef} />;
 };

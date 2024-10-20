@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 interface UseAnimationEffectProps {
   initialSpeed: number;
   totalFrames: number;
-  taskOrders: number[][];
   onFrameChange: (frame: number) => void;
 }
 
@@ -18,7 +17,6 @@ interface UseAnimationEffectReturn {
 }
 
 const useAnimationEffect = ({
-  taskOrders,
   totalFrames,
   initialSpeed,
   onFrameChange
@@ -26,20 +24,37 @@ const useAnimationEffect = ({
   const [currentFrame, setCurrentFrame] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [speed, setSpeed] = useState<number>(initialSpeed);
+  const [isAnimationOver, setIsAnimationOver] = useState<boolean>(true);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-
-  const updateFrame = useCallback(() => {
+  // TODO : Check if -1 should be where is the comment
+  const updateFrame = useCallback(async () => {
     setCurrentFrame(prevFrame => {
-      const nextFrame = (prevFrame + 1) % totalFrames;
+      const nextFrame = prevFrame + 1;
+    
+      if (nextFrame >= totalFrames) {
+        setIsPlaying(false); 
+        onFrameChange(totalFrames);
+        setIsAnimationOver(true);
+        return totalFrames;
+      }
+  
       onFrameChange(nextFrame);
+  
       return nextFrame;
     });
+  
+    // Wait for the task changes to complete before continuing
+    await new Promise((resolve) => setTimeout(resolve, 100)); // Adjust this value if needed
   }, [totalFrames, onFrameChange]);
 
   const play = useCallback(() => {
+    if(isAnimationOver){
+      reset();
+    }
     setIsPlaying(true);
+    setIsAnimationOver(false);
   }, []);
 
   const pause = useCallback(() => {
@@ -54,6 +69,7 @@ const useAnimationEffect = ({
 
 
   useEffect(() => {
+
     if (isPlaying) {
       intervalRef.current = setInterval(updateFrame, 1000 / speed);
     } else if (intervalRef.current) {
