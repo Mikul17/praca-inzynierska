@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@nextui-org/button";
-import { Input, Tooltip } from "@nextui-org/react";
+import { Input, Tab, Tabs, Tooltip } from "@nextui-org/react";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -42,6 +42,30 @@ export default function PageContent({ height }: PageContentProps) {
     generateSampleTasks(50);
   }
 
+  return (
+    <div style={{ height }} className="flex items-center flex-col">
+      <Tabs>
+
+      <Tab>
+        <div>
+          <p>Test 1</p>
+        </div>
+      </Tab>
+      <Tab>
+      <div>
+          <p>Test 2</p>
+        </div>
+      </Tab>
+      <Tab>
+      <div>
+          <p>Test 3</p>
+        </div>
+      </Tab>
+      </Tabs>
+    </div>
+  )
+}
+
   // return (
   //   <div style={{ width: "1000px" }}>
   //     <Input
@@ -54,76 +78,41 @@ export default function PageContent({ height }: PageContentProps) {
   //   </div>
   // );
 
-  return (
-    <div
-      className="flex justify-center items-center flex-col"
-      style={{ height }}
-    >
-      <div
-        className="flex flex-col shadow-outer-shadow bg-primary relative"
-        style={{ borderRadius: "16px" }}
-      >
-        <div className="absolute top-0 right-0 p-2">
-          <Tooltip content={<TooltipContent />}>
-            <div>
-              <Icon name="info" size={40} color="currentColor" />
-            </div>
-          </Tooltip>
-        </div>
-
-        <div
-          className="flex flex-col justify-between items-center"
-          style={{ padding: "60px" }}
-        >
-          <Button
-            size="lg"
-            className="text-3xl bg-primary shadow-outer-shadow"
-            style={{ border: "solid 1px black" }}
-            onClick={handleGenerateSampleData}
-          >
-            Generate sample data
-          </Button>
-          <Gap size={32} />
-          <p className="text-3xl">Or</p>
-          <Gap size={32} />
-          <FileDropzone />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/*Old design, keep just in case */
 //   return (
-//     <div className={`flex justify-center items-center flex-col`} style={{ height }}>
-//         <div
-//           className="flex flex-col shadow-outer-shadow bg-primary "
-//           style={{ borderRadius: "16px"}}
-//         >
-//           <div style={{width:"40px", height:"40px"}}>
+//     <div
+//       className="flex justify-center items-center flex-col"
+//       style={{ height }}
+//     >
+//       <div
+//         className="flex flex-col shadow-outer-shadow bg-primary relative"
+//         style={{ borderRadius: "16px" }}
+//       >
+//         <div className="absolute top-0 right-0 p-2">
 //           <Tooltip content={<TooltipContent />}>
 //             <div>
 //               <Icon name="info" size={40} color="currentColor" />
 //             </div>
 //           </Tooltip>
-//           </div>
+//         </div>
 
-//           <div className="flex flex-col justify-between items-center" style={{ padding: "60px", paddingTop: "10px"}}>
+//         <div
+//           className="flex flex-col justify-between items-center"
+//           style={{ padding: "60px" }}
+//         >
 //           <Button
 //             size="lg"
 //             className="text-3xl bg-primary shadow-outer-shadow"
 //             style={{ border: "solid 1px black" }}
-//             onClick={handleDataGeneration}
+//             onClick={handleGenerateSampleData}
 //           >
 //             Generate sample data
 //           </Button>
-//           <Gap height={32} />
+//           <Gap size={32} />
 //           <p className="text-3xl">Or</p>
-//           <Gap height={32} />
+//           <Gap size={32} />
 //           <FileDropzone />
-//           </div>
-
 //         </div>
+//       </div>
 //     </div>
 //   );
 // }

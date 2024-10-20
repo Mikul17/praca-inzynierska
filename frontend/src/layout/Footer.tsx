@@ -25,7 +25,7 @@ export default function Footer({ height }: FooterProps) {
   };
 
   return (
-    <div className="flex justify-center items-center" style={{ height }}>
+    <div className="flex justify-center items-center bg-black" style={{ height }}>
       <div
         className="flex bg-primary shadow-outer-shadow"
         style={{ borderRadius: "16px", padding: "8px", marginBottom: "32px" }}

@@ -1,6 +1,8 @@
 "use client";
 
+import { useFile } from "@/context/FileContext";
 import useWindowSize from "@/context/WindowSizeContext";
+import EmptyFilePageContent from "@/layout/EmptyFilePageContent";
 import Footer from "@/layout/Footer";
 import Gap from "@/layout/Gap";
 import Header from "@/layout/Header";
@@ -9,12 +11,13 @@ import { Spinner } from "@nextui-org/spinner";
 
 export default function Home() {
   const { height, isReady } = useWindowSize();
+  const { isFileLoaded } = useFile();
   const headerHeight = 48;
   const footerHeight = 48;
   const gapHeight = 16;
   const pageContentHeight = Math.max(
-    800 - headerHeight - footerHeight - gapHeight * 2,
-    height - headerHeight - footerHeight - gapHeight * 2
+    800 - headerHeight - footerHeight - gapHeight * 3,
+    height - headerHeight - footerHeight - gapHeight * 3
   );
 
   if (!isReady) {
@@ -35,8 +38,10 @@ export default function Home() {
       }}
     >
       <Header height={headerHeight} />
-      <Gap size={gapHeight} />
-      <PageContent height={pageContentHeight} />
+      <Gap size={2 * gapHeight} />
+      { isFileLoaded ? 
+       <PageContent height={pageContentHeight} /> : 
+       <EmptyFilePageContent height={pageContentHeight} />}
       <Gap size={gapHeight} />
       <Footer height={footerHeight} />
     </main>
