@@ -40,7 +40,7 @@ export default function Home() {
       <Header height={headerHeight} />
       <Gap size={2 * gapHeight} />
       { isFileLoaded ? 
-       <PageContent height={pageContentHeight} /> : 
+       <PageContent height={pageContentHeight}/> : 
        <EmptyFilePageContent height={pageContentHeight} />}
       <Gap size={gapHeight} />
       <Footer height={footerHeight} />

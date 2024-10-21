@@ -15,8 +15,7 @@ const taskStyle = (isRecentlyChanged: boolean) => `
   transition: background-color 0.3s ease;
 `;
 
-const GanttChart: React.FC<GanttChartProps> = ({
-}) => {
+const GanttChart: React.FC<GanttChartProps> = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<any>(null);
   const itemsRef = useRef<any>(null);
@@ -82,7 +81,6 @@ const GanttChart: React.FC<GanttChartProps> = ({
         verticalScroll: true,
         selectable: false,
         maxHeight: 500,
-        width: 1200,
         tooltip: {
           followMouse: true,
         },
@@ -135,7 +133,7 @@ const GanttChart: React.FC<GanttChartProps> = ({
     }
   }, [tasks, recentlyChangedTasks]);
 
-  return <div ref={containerRef} />;
+  return <div ref={containerRef}/>;
 };
 
 export default GanttChart;
