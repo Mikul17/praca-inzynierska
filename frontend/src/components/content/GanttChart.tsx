@@ -34,7 +34,6 @@ const GanttChart: React.FC<GanttChartProps> = () => {
         ...task,
         actualStart: start,
         actualEnd: end,
-
       };
     });
   };

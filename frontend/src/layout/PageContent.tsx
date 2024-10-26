@@ -1,14 +1,8 @@
 "use client";
-import { Button } from "@nextui-org/button";
-import { Input, Tab, Tabs, Tooltip } from "@nextui-org/react";
+import {  Tab, Tabs } from "@nextui-org/react";
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import toast from "react-hot-toast";
 import { useTaskContext } from "@/context/TaskContext";
-import FileDropzone from "@/components/content/FileDropzone";
-import TooltipContent from "@/components/content/TooltipInformation";
-import Icon from "@/components/Icon";
-import Gap from "./Gap";
 import { useFile } from "@/context/FileContext";
 import GraphPage from "./GraphPage";
 
@@ -22,11 +16,8 @@ const GanttChart = dynamic(() => import("../components/content/GanttChart"), {
 });
 
 export default function PageContent({ height }: PageContentProps) {
-  const { tasks, setOrder, validateOrder } = useTaskContext();
-  const { generateSampleTasks } = useFile();
-  const [inputValue, setInputValue] = useState("");
-
   const contentHeight = typeof height === "number" ? height - 80 : height;
+
 
   return (
     <div style={{ height: height}} className="flex items-center flex-col">

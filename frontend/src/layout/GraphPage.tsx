@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { useTaskContext } from "@/context/TaskContext";
 import GanttChart from "@/components/content/GanttChart";
 import Gap from "./Gap";
 import Chart from "react-google-charts";
+import SolutionChart from "@/components/content/SolutionChart";
 
 interface LayoutProps {
   readonly height: number | string;
@@ -14,11 +15,11 @@ export default function GraphPage({ height }: LayoutProps) {
   return (
     <div style={{ height: height }} className="flex w-full h-full">
       <div style={{ width:"50%"}}>
-        {tasks ? <GanttChart /> : <div>NIE MA DANYCH :c</div>}
+        <GanttChart />
       </div>
       <Gap size={64} orientation="vertical"/>
       <div style={{ width:"50%"}}>
-        <Chart chartType={"LineChart"} />
+       <SolutionChart />
       </div>
     </div>
   );

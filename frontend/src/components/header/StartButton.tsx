@@ -7,15 +7,15 @@ import { useTaskContext } from "@/context/TaskContext";
 
 export default function StartButton() {
   const { isFileLoaded } = useFile();
-  const { tasks, updateOrders, setOrderForAnimation } = useTaskContext();
+  const { tasks, updateOrders, setOrderForAnimation, resetHistory } = useTaskContext();
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const { play } = useAnimationEffect({
     totalFrames: tasks.length,
     initialSpeed: 1,
     onFrameChange: (frame) => {
       setTimeout(() => setOrderForAnimation(testOrders[frame]), 0);
-      console.log("FINISHED FRAME "+frame)
-    }
+    },
+    onAnimationStart: () => resetHistory()
   });
 
   const testOrders = [

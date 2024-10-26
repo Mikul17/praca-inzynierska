@@ -4,6 +4,8 @@ interface UseAnimationEffectProps {
   initialSpeed: number;
   totalFrames: number;
   onFrameChange: (frame: number) => void;
+  onAnimationEnd?: () => void;
+  onAnimationStart?: () => void;
 }
 
 interface UseAnimationEffectReturn {
@@ -19,7 +21,9 @@ interface UseAnimationEffectReturn {
 const useAnimationEffect = ({
   totalFrames,
   initialSpeed,
-  onFrameChange
+  onFrameChange,
+  onAnimationEnd,
+  onAnimationStart
 }: UseAnimationEffectProps): UseAnimationEffectReturn => {
   const [currentFrame, setCurrentFrame] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -37,6 +41,11 @@ const useAnimationEffect = ({
         setIsPlaying(false); 
         onFrameChange(totalFrames);
         setIsAnimationOver(true);
+
+        if (onAnimationEnd) {
+          onAnimationEnd();
+        }
+
         return totalFrames;
       }
   
@@ -53,6 +62,11 @@ const useAnimationEffect = ({
     if(isAnimationOver){
       reset();
     }
+
+    if (onAnimationStart) {
+      onAnimationStart();
+    }
+    
     setIsPlaying(true);
     setIsAnimationOver(false);
   }, []);

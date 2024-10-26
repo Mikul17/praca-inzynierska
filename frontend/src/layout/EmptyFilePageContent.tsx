@@ -13,7 +13,7 @@ export default function EmptyFilePageContent({height}: LayoutProps) {
     const { generateSampleTasks } = useFile();
 
     const handleGenerateSampleData = () => {
-        generateSampleTasks(50);
+        generateSampleTasks(3);
       }
     
 
