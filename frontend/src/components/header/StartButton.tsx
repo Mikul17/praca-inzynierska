@@ -47,7 +47,7 @@ export default function StartButton() {
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleClick}
     >
-      {isFileLoaded ? "" : "Load data"}
+      {isFileLoaded ? "" : "Load data first"}
       {isHovered ? "Start" : ""}
     </Button>
   );

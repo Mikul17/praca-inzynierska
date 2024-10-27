@@ -5,48 +5,33 @@ import { useState } from "react";
 import { useTaskContext } from "@/context/TaskContext";
 import { useFile } from "@/context/FileContext";
 import GraphPage from "./GraphPage";
+import GanttSectionHeader from "./Gantt/GraphPageHeader";
+import DataSection from "./Data/DataSection";
 
 interface PageContentProps {
-  height: number | string;
+  height: number;
 }
 
-// Dynamiczny import z wyłączonym SSR
-const GanttChart = dynamic(() => import("../components/content/GanttChart"), {
-  ssr: false,
-});
-
 export default function PageContent({ height }: PageContentProps) {
-  const contentHeight = typeof height === "number" ? height - 80 : height;
+  const contentHeight = height - 16;
 
-
+ 
   return (
-    <div style={{ height: height}} className="flex items-center flex-col">
+    <div style={{ height: height, minHeight: height}} className="flex items-center flex-col p-3">
       <Tabs
         size="lg"
         classNames={{
           tabList: "w-full flex",
-          panel: "w-full p-4"
+          panel: "w-full",
         }}
       >
         <Tab key="Graphs" title="Graphs">
           <GraphPage height={contentHeight} />
         </Tab>
         <Tab key="Data" title="Data">
-          {/* Your other content */}
+          <DataSection height={contentHeight}/>
         </Tab>
       </Tabs>
     </div>
   );
 }
-
-// return (
-//   <div style={{ width: "1000px" }}>
-//     <Input
-//       placeholder="Wpisz kolejność zadań (np. 1 2 3)"
-//       value={inputValue}
-//       onChange={(e) => setInputValue(e.target.value)}
-//       width="300px"
-//     />
-//     <GanttChart />
-//   </div>
-// );

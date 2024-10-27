@@ -7,13 +7,14 @@ import React, {
   useState,
   useCallback,
   useRef,
-  useEffect,
 } from "react";
 
 interface TaskContextType {
   bestCmax: number;
   currentCmax: number;
   currentOrder: number[];
+  previousCmax: number;
+  previousBestCmax: number;
   allOrders: number[][];
   tasks: Task[];
   cmaxHistory: number[];
@@ -47,6 +48,9 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
   const [currentCmax, setCurrentCmax] = useState<number>(Infinity);
   const [cmaxHistory, setCmaxHistory] = useState<number[]>([]);
   const [currentOrder, setCurrentOrder] = useState<number[]>([]);
+  const [previousCmax, setPreviousCmax] = useState<number>(Infinity);
+  const [previousBestCmax, setPreviousBestCmax] = useState<number>(Infinity);
+  const [bestOrder, setBestOrder] = useState<number[]>([]);
   const [allOrders, setAllOrders] = useState<number[][]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [recentlyChangedTasks, setRecentlyChangedTasks] = useState<Set<number>>(
@@ -64,6 +68,10 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
         cmax = Math.max(cmax, time + task.q);
       }
     });
+
+    if(cmax === 0) {
+      return Infinity;
+    }
 
     return cmax;
   };
@@ -145,9 +153,12 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
   const updateCmax = useCallback(
     (order: number[], isAnimation: boolean) => {
       const cmax = calculateCmax(order);
+      setPreviousCmax(currentCmax);
       setCurrentCmax(cmax);
       if (cmax < bestCmax) {
+        setPreviousBestCmax(bestCmax);
         setBestCmax(cmax);
+        setBestOrder(order);
       }
 
       if (isAnimation) {
@@ -168,6 +179,9 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
 
   const setOrder = useCallback(
     (order: number[]) => {
+      if(!validateOrder(order)) {
+        return;
+      }
       resetRecentlyChangedTasks();
       setCurrentOrder(order);
       updateCmax(order, false);
@@ -194,6 +208,8 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
     currentCmax,
     cmaxHistory,
     currentOrder,
+    previousCmax,
+    previousBestCmax,
     allOrders,
     tasks,
     recentlyChangedTasks,

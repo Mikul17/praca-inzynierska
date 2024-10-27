@@ -16,8 +16,8 @@ export default function Home() {
   const footerHeight = 48;
   const gapHeight = 16;
   const pageContentHeight = Math.max(
-    800 - headerHeight - footerHeight - gapHeight * 3,
-    height - headerHeight - footerHeight - gapHeight * 3
+    800 - headerHeight - footerHeight - gapHeight * 2,
+    height - headerHeight - footerHeight - gapHeight * 2
   );
 
   if (!isReady) {
@@ -34,11 +34,12 @@ export default function Home() {
         width: "100%",
         minWidth: "800px",
         height: "100%",
-        minHeight: "500px",
+        minHeight: "800px",
+        overflow: "hidden"
       }}
     >
       <Header height={headerHeight} />
-      <Gap size={2 * gapHeight} />
+      <Gap size={ gapHeight} />
       { isFileLoaded ? 
        <PageContent height={pageContentHeight}/> : 
        <EmptyFilePageContent height={pageContentHeight} />}
