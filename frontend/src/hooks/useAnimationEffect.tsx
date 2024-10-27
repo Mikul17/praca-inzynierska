@@ -31,45 +31,41 @@ const useAnimationEffect = ({
   const [isAnimationOver, setIsAnimationOver] = useState<boolean>(true);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const lastFrameRef = useRef<number>(-1);
 
-  // TODO : Check if -1 should be where is the comment
-  const updateFrame = useCallback(async () => {
+  const updateFrame = useCallback(() => {
     setCurrentFrame(prevFrame => {
       const nextFrame = prevFrame + 1;
-    
       if (nextFrame >= totalFrames) {
-        setIsPlaying(false); 
-        onFrameChange(totalFrames);
+        setIsPlaying(false);
         setIsAnimationOver(true);
-
         if (onAnimationEnd) {
           onAnimationEnd();
         }
-
         return totalFrames;
       }
-  
-      onFrameChange(nextFrame);
-  
       return nextFrame;
     });
-  
-    // Wait for the task changes to complete before continuing
-    await new Promise((resolve) => setTimeout(resolve, 100)); // Adjust this value if needed
-  }, [totalFrames, onFrameChange]);
+  }, [totalFrames, onAnimationEnd]);
+
+  useEffect(() => {
+    // Only trigger `onFrameChange` if `currentFrame` has truly changed.
+    if (currentFrame !== lastFrameRef.current) {
+      onFrameChange(currentFrame);
+      lastFrameRef.current = currentFrame;
+    }
+  }, [currentFrame, onFrameChange]);
 
   const play = useCallback(() => {
-    if(isAnimationOver){
+    if (isAnimationOver) {
       reset();
     }
-
     if (onAnimationStart) {
       onAnimationStart();
     }
-    
     setIsPlaying(true);
     setIsAnimationOver(false);
-  }, []);
+  }, [isAnimationOver, onAnimationStart]);
 
   const pause = useCallback(() => {
     setIsPlaying(false);
@@ -78,18 +74,16 @@ const useAnimationEffect = ({
   const reset = useCallback(() => {
     setCurrentFrame(0);
     setIsPlaying(false);
+    lastFrameRef.current = 0;
     onFrameChange(0);
   }, [onFrameChange]);
 
-
   useEffect(() => {
-
     if (isPlaying) {
       intervalRef.current = setInterval(updateFrame, 1000 / speed);
     } else if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);

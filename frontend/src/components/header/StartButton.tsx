@@ -9,24 +9,26 @@ export default function StartButton() {
   const { isFileLoaded } = useFile();
   const { tasks, updateOrders, setOrderForAnimation, resetHistory } = useTaskContext();
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const { play } = useAnimationEffect({
-    totalFrames: tasks.length,
-    initialSpeed: 1,
-    onFrameChange: (frame) => {
-      setTimeout(() => setOrderForAnimation(testOrders[frame]), 0);
-    },
-    onAnimationStart: () => resetHistory()
-  });
-
   const testOrders = [
     [1,2,3],
     [2,1,3],
     [2,3,1],
     [3,2,1]
   ]
+  const { play, setSpeed } = useAnimationEffect({
+    totalFrames: testOrders.length -1 ,
+    initialSpeed: 1,
+    onFrameChange: (frame) => {
+      console.log("Frame: ", frame);
+      setTimeout(() => setOrderForAnimation(testOrders[frame]), 0);
+    },
+    onAnimationStart: () => resetHistory(),
+  });
+
 
   const handleClick = () => {
     updateOrders(testOrders);
+    setSpeed(1.0);
     play();
   }
 
