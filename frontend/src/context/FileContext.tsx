@@ -14,6 +14,7 @@ interface FileContextType {
   isUploading: boolean;
   generateSampleTasks: (size: number) => void;
   downloadFile: (format: "csv" | "txt", orderOnly: boolean) => void;
+  deleteLoadedFile: () => void;
 }
 
 const FileContext = createContext<FileContextType | undefined>(undefined);
@@ -83,7 +84,7 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const tasks: Array<Task> = [];
     for( let i = 0; i<size; i++){
         tasks.push({
-            id:i,
+            id:i+1,
             r: Math.floor(Math.random() * (MAX_GENERATED_VALUE - MIN_GENERATED_VALUE) + MIN_GENERATED_VALUE),
         p: Math.floor(Math.random() * (MAX_GENERATED_VALUE - MIN_GENERATED_VALUE) + MIN_GENERATED_VALUE),
         q: Math.floor(Math.random() * (MAX_GENERATED_VALUE - MIN_GENERATED_VALUE) + MIN_GENERATED_VALUE),
@@ -138,10 +139,35 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  const deleteLoadedFile = () => {
+    if(!isFileLoaded){
+      console.log("Error: file is not loaded");
+      toast.error("File must be loaded to be deleted")
+      return;
+    }
+
+    setIsFileLoaded(false);
+    setFileName('');
+    setFileTasks([]);
+    sessionStorage.clear();
+  }
+
+  const value = {
+    isFileLoaded,
+    fileTasks,
+    fileName,
+    loadFile,
+    sendFileToBackend,
+    isUploading,
+    loadSampleData,
+    generateSampleTasks,
+    downloadFile,
+    deleteLoadedFile
+  }
 
 
   return (
-    <FileContext.Provider value={{ isFileLoaded, fileTasks, fileName, loadFile, sendFileToBackend, isUploading, loadSampleData, generateSampleTasks, downloadFile }}>
+    <FileContext.Provider value={value}>
       {children}
     </FileContext.Provider>
   );

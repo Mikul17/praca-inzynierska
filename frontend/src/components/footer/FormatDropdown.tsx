@@ -14,7 +14,7 @@ export default function FormatDropdown({
 }: FormatDropdownProps) {
   return (
     <Select
-      className="w-24"
+      className="w-32"
       fullWidth={false}
       placeholder="Format"
       onChange={(e) => setSelectedFormat(e.target.value)}

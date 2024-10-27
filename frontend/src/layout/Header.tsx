@@ -1,6 +1,8 @@
 "use client";
 
 import AlgorithmSelector from "@/components/header/AlgorithmSelector";
+import DeleteButton from "@/components/header/DeleteButton";
+import FileName from "@/components/header/FileName";
 import StartButton from "@/components/header/StartButton";
 import { useFile } from "@/context/FileContext";
 
@@ -17,15 +19,9 @@ export default function Header({ height }: HeaderProps) {
         <AlgorithmSelector />
         <StartButton />
       </div>
-      <div
-        className="flex justify-center items-center bg-secondary p-4 h-[48px] shadow-outer-shadow"
-        style={{ borderRadius: "1rem 0 0 1rem", maxWidth: "30rem" }}
-      >
-        {fileName ? (
-          <span className="text-2xl truncate ">File: {fileName}</span>
-        ) : (
-          <span className="text-2xl">No file selected</span>
-        )}
+      <div className="flex gap-4">
+        <DeleteButton />
+        <FileName />
       </div>
     </div>
   );
