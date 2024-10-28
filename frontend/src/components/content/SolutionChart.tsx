@@ -37,19 +37,13 @@ export default function SolutionChart({data, title, xAxisTitle, yAxisTitle}: Cha
       backgroundColor: '#faf9f6',
     };
 
-    if(data.length === 0 || data === undefined) {
-        return <div className="flex justify-center ">
-          <Image src={NoDataImage} alt="No data available" />
-        </div>
-    }
-
   return (
     <div className="bg-primary">
       <Chart 
       chartType={"LineChart"}
       data={chartData}
       options={options}
-      legendToggle={true}
+      legendToggle={false}
       className="bg-primary"
       />
     </div>

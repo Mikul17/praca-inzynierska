@@ -7,6 +7,7 @@ import Footer from "@/layout/Footer";
 import Gap from "@/layout/Gap";
 import Header from "@/layout/Header";
 import PageContent from "@/layout/PageContent";
+import { Modal } from "@nextui-org/modal";
 import { Spinner } from "@nextui-org/spinner";
 
 export default function Home() {
@@ -35,14 +36,16 @@ export default function Home() {
         minWidth: "800px",
         height: "100%",
         minHeight: "800px",
-        overflow: "hidden"
+        overflow: "hidden",
       }}
     >
       <Header height={headerHeight} />
-      <Gap size={ gapHeight} />
-      { isFileLoaded ? 
-       <PageContent height={pageContentHeight}/> : 
-       <EmptyFilePageContent height={pageContentHeight} />}
+      <Gap size={gapHeight} />
+      {isFileLoaded ? (
+        <PageContent height={pageContentHeight} />
+      ) : (
+        <EmptyFilePageContent height={pageContentHeight} />
+      )}
       <Gap size={gapHeight} />
       <Footer height={footerHeight} />
     </main>
