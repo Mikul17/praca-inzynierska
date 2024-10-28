@@ -15,6 +15,7 @@ interface TaskContextType {
   currentOrder: number[];
   previousCmax: number;
   previousBestCmax: number;
+  bestOrder: number[];
   allOrders: number[][];
   tasks: Task[];
   cmaxHistory: number[];
@@ -210,6 +211,7 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
     currentOrder,
     previousCmax,
     previousBestCmax,
+    bestOrder,
     allOrders,
     tasks,
     recentlyChangedTasks,

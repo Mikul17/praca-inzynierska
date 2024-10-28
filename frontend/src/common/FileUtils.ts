@@ -3,7 +3,7 @@ import { Task } from "./types";
 export const ALLOWED_FILE_FORMATS : Array<string> = ["csv","txt"];
 
 
-export const convertTasksToFile = (format: "csv" | "txt" = "csv", orderOnly: boolean): File | null => {
+export const convertTasksToFile = (format: "csv" | "txt" = "csv", orderOnly: boolean, order: number[]): File | null => {
   const storedTasks = sessionStorage.getItem('fileTasks');
   const storedFileName = sessionStorage.getItem('fileName');
 
@@ -18,7 +18,7 @@ export const convertTasksToFile = (format: "csv" | "txt" = "csv", orderOnly: boo
   let fileName: string;
 
   if(orderOnly){
-    content = tasks.map((task) => `${task.id}`).join(",");
+    content = order.map((id) => `${id}`).join(",");
   }else{
     content = tasks.map((task) => `${task.id},${task.r},${task.p},${task.q}`).join("\n");
   }

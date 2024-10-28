@@ -5,6 +5,7 @@ import Gap from "./Gap";
 import { Checkbox } from "@nextui-org/react";
 import { useState } from "react";
 import { useFile } from "@/context/FileContext";
+import { useTaskContext } from "@/context/TaskContext";
 
 interface FooterProps {
   height: number | string;
@@ -12,6 +13,7 @@ interface FooterProps {
 
 export default function Footer({ height }: FooterProps) {
   const { isFileLoaded, downloadFile } = useFile();
+  const { bestOrder } = useTaskContext();
   const [orderOnly, setIsOrderOnly] = useState<boolean>(false);
   const [selectedFormat, setSelectedFormat] = useState<string>();
 
@@ -20,7 +22,7 @@ export default function Footer({ height }: FooterProps) {
       selectedFormat &&
       (selectedFormat === "csv" || selectedFormat === "txt")
     ) {
-      downloadFile(selectedFormat, orderOnly);
+      downloadFile(selectedFormat, orderOnly, bestOrder);
     }
   };
 

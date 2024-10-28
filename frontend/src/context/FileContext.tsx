@@ -12,8 +12,8 @@ interface FileContextType {
   sendFileToBackend: () => Promise<void>;
   loadSampleData: (tasks: Task[]) => void;
   isUploading: boolean;
-  generateSampleTasks: (size: number) => void;
-  downloadFile: (format: "csv" | "txt", orderOnly: boolean) => void;
+  generateSampleTasks: (size: number, maxR: number, maxP: number, maxQ: number) => void;
+  downloadFile: (format: "csv" | "txt", orderOnly: boolean, order: number[]) => void;
   deleteLoadedFile: () => void;
 }
 
@@ -24,7 +24,6 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [fileTasks, setFileTasks] = useState<Task[] | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const MAX_GENERATED_VALUE = 9999;
   const MIN_GENERATED_VALUE = 1;
 
 
@@ -80,14 +79,14 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
   }, [saveToSessionStorage]);
 
-  const generateSampleTasks = (size: number) => {
+  const generateSampleTasks = (size: number, maxR: number, maxP: number, maxQ: number) => {
     const tasks: Array<Task> = [];
     for( let i = 0; i<size; i++){
         tasks.push({
             id:i+1,
-            r: Math.floor(Math.random() * (MAX_GENERATED_VALUE - MIN_GENERATED_VALUE) + MIN_GENERATED_VALUE),
-        p: Math.floor(Math.random() * (MAX_GENERATED_VALUE - MIN_GENERATED_VALUE) + MIN_GENERATED_VALUE),
-        q: Math.floor(Math.random() * (MAX_GENERATED_VALUE - MIN_GENERATED_VALUE) + MIN_GENERATED_VALUE),
+            r: Math.floor(Math.random() * (maxR - MIN_GENERATED_VALUE) + MIN_GENERATED_VALUE),
+        p: Math.floor(Math.random() * (maxP - MIN_GENERATED_VALUE) + MIN_GENERATED_VALUE),
+        q: Math.floor(Math.random() * (maxQ - MIN_GENERATED_VALUE) + MIN_GENERATED_VALUE),
       });
     }
     loadSampleData(tasks)
@@ -122,8 +121,8 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [isFileLoaded, fileTasks, fileName]);
 
-  const downloadFile = useCallback((format: "csv" | "txt", orderOnly: boolean) => {
-    const file = convertTasksToFile(format, orderOnly);
+  const downloadFile = useCallback((format: "csv" | "txt", orderOnly: boolean, order: number[]) => {
+    const file = convertTasksToFile(format, orderOnly, order);
     if (file) {
       const url = URL.createObjectURL(file);
       const link = document.createElement('a');
