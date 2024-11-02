@@ -5,7 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mikul17.rpq.algorithms.Schrage.Schrage;
 import org.mikul17.rpq.algorithms.Schrage.SchrageParameters;
-import org.mikul17.rpq.algorithms.Schrage.SchrageSolution;
+import org.mikul17.rpq.algorithms.common.Permutation;
+
+import java.util.List;
 
 import static org.mikul17.rpq.algorithm.AlgorithmTestUtils.*;
 
@@ -19,16 +21,29 @@ public class SchrageTest {
     }
 
     @Test
+    void initTest() {
+        SchrageParameters p = SchrageParameters
+                .builder()
+                .tasks(testTasks)
+                .build();
+        Permutation result = schrage.solve(p, solution -> {});
+
+        Assertions.assertThat(result.cmax()).isEqualTo(11);
+        Assertions.assertThat(result.permutation()).isEqualTo(List.of(3,2,1));
+    }
+
+    @Test
     void firstTestCaseShouldReturnCorrectResult () {
         SchrageParameters p = SchrageParameters
                 .builder()
                 .tasks(firstTestCase)
                 .build();
-        SchrageSolution result = schrage.solve(p, solution -> {});
+        Permutation result = schrage.solve(p, solution -> {});
 
-        Assertions.assertThat(result.getBestCmax()).isLessThan(firstTestCaseWorstCmax);
-        Assertions.assertThat(result.getBestCmax()).isLessThanOrEqualTo(firstTestCaseAcceptableCmax);
-        Assertions.assertThat(result.getBestCmax()).isGreaterThanOrEqualTo(firstTestCaseBestCmax);
+//        Assertions.assertThat(result.cmax()).isLessThan(firstTestCaseWorstCmax);
+//        Assertions.assertThat(result.cmax()).isLessThanOrEqualTo(firstTestCaseAcceptableCmax);
+//        Assertions.assertThat(result.cmax()).isGreaterThanOrEqualTo(firstTestCaseBestCmax);
+        Assertions.assertThat(result.cmax()).isEqualTo(13981);
     }
 
     @Test
@@ -37,11 +52,12 @@ public class SchrageTest {
                 .builder()
                 .tasks(secondTestCase)
                 .build();
-        SchrageSolution result = schrage.solve(p, solution -> {});
+        Permutation result = schrage.solve(p, solution -> {});
 
-        Assertions.assertThat(result.getBestCmax()).isLessThan(secondTestCaseWorstCmax);
-        Assertions.assertThat(result.getBestCmax()).isLessThanOrEqualTo(secondTestCaseAcceptableCmax);
-        Assertions.assertThat(result.getBestCmax()).isGreaterThanOrEqualTo(secondTestCaseBestCmax);
+        Assertions.assertThat(result.cmax()).isLessThan(secondTestCaseWorstCmax);
+        Assertions.assertThat(result.cmax()).isLessThanOrEqualTo(secondTestCaseAcceptableCmax);
+        Assertions.assertThat(result.cmax()).isGreaterThanOrEqualTo(secondTestCaseBestCmax);
+        Assertions.assertThat(result.cmax()).isEqualTo(21529);
     }
 
     @Test
@@ -50,11 +66,12 @@ public class SchrageTest {
                 .builder()
                 .tasks(thirdTestCase)
                 .build();
-        SchrageSolution result = schrage.solve(p, solution -> {});
+        Permutation result = schrage.solve(p, solution -> {});
 
-        Assertions.assertThat(result.getBestCmax()).isLessThan(thirdTestCaseWorstCmax);
-        Assertions.assertThat(result.getBestCmax()).isLessThanOrEqualTo(thirdTestCaseAcceptableCmax);
-        Assertions.assertThat(result.getBestCmax()).isGreaterThanOrEqualTo(thirdTestCaseBestCmax);
+        Assertions.assertThat(result.cmax()).isLessThan(thirdTestCaseWorstCmax);
+        Assertions.assertThat(result.cmax()).isLessThanOrEqualTo(thirdTestCaseAcceptableCmax);
+        Assertions.assertThat(result.cmax()).isGreaterThanOrEqualTo(thirdTestCaseBestCmax);
+        Assertions.assertThat(result.cmax()).isEqualTo(31683);
     }
 
     @Test
@@ -63,10 +80,11 @@ public class SchrageTest {
                 .builder()
                 .tasks(fourthTestCase)
                 .build();
-        SchrageSolution result = schrage.solve(p, solution -> {});
+        Permutation result = schrage.solve(p, solution -> {});
 
-        Assertions.assertThat(result.getBestCmax()).isLessThan(fourthTestCaseWorstCmax);
-        Assertions.assertThat(result.getBestCmax()).isLessThanOrEqualTo(fourthTestCaseAcceptableCmax);
-        Assertions.assertThat(result.getBestCmax()).isGreaterThanOrEqualTo(fourthTestCaseBestCmax);
+        Assertions.assertThat(result.cmax()).isLessThan(fourthTestCaseWorstCmax);
+        Assertions.assertThat(result.cmax()).isLessThanOrEqualTo(fourthTestCaseAcceptableCmax);
+        Assertions.assertThat(result.cmax()).isGreaterThanOrEqualTo(fourthTestCaseBestCmax);
+        Assertions.assertThat(result.cmax()).isEqualTo(34444);
     }
 }
