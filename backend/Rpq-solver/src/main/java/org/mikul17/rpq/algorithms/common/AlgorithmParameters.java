@@ -19,8 +19,9 @@ import java.util.Map;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class SolverParameters {
+public abstract class AlgorithmParameters {
     protected List<Task> tasks;
 
     public abstract void fromMap(Map<String, Object> map);
+    public abstract void updateFromMap(Map<String, Object> map);
 }

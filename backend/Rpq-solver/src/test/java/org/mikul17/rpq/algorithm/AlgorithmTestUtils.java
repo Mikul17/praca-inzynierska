@@ -6,6 +6,11 @@ import java.util.List;
 
 public class AlgorithmTestUtils {
 
+    static final List<Task> testTasks = List.of(
+            new Task(1, 2, 2, 3),
+            new Task(2, 4, 1, 6),
+            new Task(3, 0, 3, 4)
+    );
     static final int firstTestCaseBestCmax = 13862;
     static final int firstTestCaseWorstCmax = 25994;
     static final int firstTestCaseAcceptableCmax = 15000;

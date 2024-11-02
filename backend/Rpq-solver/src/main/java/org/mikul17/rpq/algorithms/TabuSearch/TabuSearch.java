@@ -1,8 +1,11 @@
 package org.mikul17.rpq.algorithms.TabuSearch;
 
 import lombok.Builder;
+import lombok.SneakyThrows;
+import org.mikul17.rpq.algorithms.SimulatedAnnealing.SimulatedAnnealingaBatchedSolution;
+import org.mikul17.rpq.algorithms.common.Algorithm;
 import org.mikul17.rpq.algorithms.common.Permutation;
-import org.mikul17.rpq.algorithms.common.Solver;
+import org.mikul17.rpq.algorithms.common.Solution;
 import org.mikul17.rpq.algorithms.common.Task;
 
 import java.util.ArrayList;
@@ -18,7 +21,7 @@ import java.util.function.Consumer;
  * it finds the best move to make and adds it to tabu list. If the move is better
  * than the previous one, it updates the best permutation.
  */
-public class TabuSearch implements Solver<TabuSearchParameters, TabuSearchSolution> {
+public class TabuSearch implements Algorithm<TabuSearchParameters, TabuSearchBatchedSolution> {
 
     /**
      * Solves the scheduling problem using the Tabu Search algorithm.
@@ -26,41 +29,53 @@ public class TabuSearch implements Solver<TabuSearchParameters, TabuSearchSoluti
      * @param parameters - contains all necessary parameters for the Tabu Search algorithm
      * @return TabuSearchSolution - object containing the best permutation and Cmax value
      * @see TabuSearchParameters
-     * @see TabuSearchSolution
+     * @see TabuSearchBatchedSolution
      */
+    @SneakyThrows
     @Override
-    public TabuSearchSolution solve (TabuSearchParameters parameters, Consumer<TabuSearchSolution> solutionConsumer) {
-        TabuSearchSolution solution = new TabuSearchSolution();
-        long startTime = System.nanoTime();
+    public Permutation solve (TabuSearchParameters parameters, Consumer<TabuSearchBatchedSolution> solutionConsumer) {
+        TabuSearchBatchedSolution batchedSolution = new TabuSearchBatchedSolution();
+        Solution bestSolution = new Solution();
 
         /* Temporary variables used in algorithm */
         List<Task> copy = new ArrayList<>(parameters.getTasks());
         int bestCmax = Integer.MAX_VALUE;
-        Permutation bestPermutation = Permutation.of(parameters.getTasks());
+        Permutation bestPermutation = null;
         List<TabuMove> tabuList = new ArrayList<>(parameters.tabuListSize);
 
         /* main algorithm loop */
         for (int i = 0; i < parameters.maxIterations; i++) {
             TabuMove result = findBestTabu(copy, tabuList);
-            int currentlyBestCmax = result.moveCmax;
-
-            Collections.swap(copy, result.firstTask, result.secondTask);
+            int currentlyBestCmax = result.moveCmax();
+            Collections.swap(copy, result.firstTask(), result.secondTask());
             addMoveToTabuList(result, tabuList, parameters.tabuListSize);
+            batchedSolution.addTabuMove(result);
 
             if (currentlyBestCmax < bestCmax) {
                 bestCmax = currentlyBestCmax;
-                bestPermutation = Permutation.of(copy);
+                bestPermutation = Permutation.fromTasks(bestCmax, copy);
+            }
+
+            bestSolution.setBestCmax(bestCmax);
+            bestSolution.setBestOrder(bestPermutation != null ? bestPermutation.permutation() : null);
+            batchedSolution.setBestSolution(bestSolution);
+            solutionConsumer.accept(batchedSolution);
+            batchedSolution = new TabuSearchBatchedSolution();
+            Thread.sleep(4000);
+
+            if(parameters.clearTabuList) {
+                tabuList.clear();
+                parameters.clearTabuList = false;
+            }
+
+            parameters.applyPendingChanges();
+            if(parameters.resizeTabuList) {
+                tabuList = resizeTabuList(tabuList, parameters.tabuListSize);
+                parameters.resizeTabuList = false;
             }
         }
 
-        /* assigning solution parameters */
-        long endTime = System.nanoTime();
-        long duration = endTime - startTime;
-        solution.setBestCmax(bestCmax);
-        solution.setBestPermutation(bestPermutation);
-        solution.setDuration(duration);
-
-        return solution;
+        return bestPermutation;
     }
 
     /**
@@ -103,12 +118,7 @@ public class TabuSearch implements Solver<TabuSearchParameters, TabuSearchSoluti
                 Collections.swap(copy, i, j);
             }
         }
-        return TabuMove
-                .builder()
-                .firstTask(firstBestTask)
-                .secondTask(secondBestTask)
-                .moveCmax(bestCmax)
-                .build();
+        return new TabuMove(firstBestTask, secondBestTask, bestCmax);
     }
 
     /**
@@ -121,25 +131,23 @@ public class TabuSearch implements Solver<TabuSearchParameters, TabuSearchSoluti
      */
     private boolean isTabu (int i, int j, List<TabuMove> tabuList) {
         for (TabuMove move : tabuList) {
-            if (move.firstTask == i && move.secondTask == j) {
+            if (move.firstTask() == i && move.secondTask() == j) {
                 return true;
             }
         }
         return false;
     }
 
-    /**
-     * Class that represents a move in the Tabu Search algorithm which
-     * will be stored in the tabu list.
-     *
-     * @field firstTask - index of the first task to swap
-     * @field secondTask - index of the second task to swap
-     * @field moveCmax - Cmax value after swapping tasks
-     */
-    @Builder
-    private static class TabuMove {
-        public int firstTask;
-        public int secondTask;
-        public int moveCmax;
+    private List<TabuMove> resizeTabuList(List<TabuMove> tabuList, int maxSize) {
+        if (tabuList.size() > maxSize) {
+            return tabuList.subList(tabuList.size() - maxSize, tabuList.size());
+        }
+
+        if(tabuList.size() < maxSize) {
+            return new ArrayList<>(tabuList);
+        }
+
+        return tabuList;
     }
+
 }
