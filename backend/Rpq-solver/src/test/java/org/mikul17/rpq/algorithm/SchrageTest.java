@@ -7,7 +7,6 @@ import org.mikul17.rpq.algorithms.Schrage.Schrage;
 import org.mikul17.rpq.algorithms.Schrage.SchrageParameters;
 import org.mikul17.rpq.algorithms.common.Permutation;
 
-import java.util.List;
 
 import static org.mikul17.rpq.algorithm.AlgorithmTestUtils.*;
 
@@ -21,70 +20,74 @@ public class SchrageTest {
     }
 
     @Test
-    void initTest() {
+    void firstDatasetShouldReturnCorrectResult () {
         SchrageParameters p = SchrageParameters
                 .builder()
-                .tasks(testTasks)
+                .tasks(schrageTest1)
+                .preemptive(false)
                 .build();
         Permutation result = schrage.solve(p, solution -> {});
 
-        Assertions.assertThat(result.cmax()).isEqualTo(11);
-        Assertions.assertThat(result.permutation()).isEqualTo(List.of(3,2,1));
+        Assertions.assertThat(result.cmax()).isEqualTo(schrageTest1Cmax);
     }
 
     @Test
-    void firstTestCaseShouldReturnCorrectResult () {
+    void secondDatasetShouldReturnCorrectResult() {
         SchrageParameters p = SchrageParameters
                 .builder()
-                .tasks(firstTestCase)
+                .tasks(schrageTest2)
+                .preemptive(false)
                 .build();
         Permutation result = schrage.solve(p, solution -> {});
 
-//        Assertions.assertThat(result.cmax()).isLessThan(firstTestCaseWorstCmax);
-//        Assertions.assertThat(result.cmax()).isLessThanOrEqualTo(firstTestCaseAcceptableCmax);
-//        Assertions.assertThat(result.cmax()).isGreaterThanOrEqualTo(firstTestCaseBestCmax);
-        Assertions.assertThat(result.cmax()).isEqualTo(13981);
+        Assertions.assertThat(result.cmax()).isEqualTo(schrageTest2Cmax);
     }
 
     @Test
-    void secondDatasetShouldReturnCorrectResult () {
+    void thirdDatasetShouldReturnCorrectResult() {
         SchrageParameters p = SchrageParameters
                 .builder()
-                .tasks(secondTestCase)
+                .tasks(schrageTest3)
+                .preemptive(false)
                 .build();
         Permutation result = schrage.solve(p, solution -> {});
 
-        Assertions.assertThat(result.cmax()).isLessThan(secondTestCaseWorstCmax);
-        Assertions.assertThat(result.cmax()).isLessThanOrEqualTo(secondTestCaseAcceptableCmax);
-        Assertions.assertThat(result.cmax()).isGreaterThanOrEqualTo(secondTestCaseBestCmax);
-        Assertions.assertThat(result.cmax()).isEqualTo(21529);
+        Assertions.assertThat(result.cmax()).isEqualTo(schrageTest3Cmax);
     }
 
     @Test
-    void thirdDatasetShouldReturnCorrectResult () {
+    void firstPreemptiveDatasetShouldReturnCorrectResult () {
         SchrageParameters p = SchrageParameters
                 .builder()
-                .tasks(thirdTestCase)
+                .tasks(schrageTest1)
+                .preemptive(true)
                 .build();
         Permutation result = schrage.solve(p, solution -> {});
 
-        Assertions.assertThat(result.cmax()).isLessThan(thirdTestCaseWorstCmax);
-        Assertions.assertThat(result.cmax()).isLessThanOrEqualTo(thirdTestCaseAcceptableCmax);
-        Assertions.assertThat(result.cmax()).isGreaterThanOrEqualTo(thirdTestCaseBestCmax);
-        Assertions.assertThat(result.cmax()).isEqualTo(31683);
+        Assertions.assertThat(result.cmax()).isEqualTo(schragePreemptive1Cmax);
     }
 
     @Test
-    void fourthDatasetShouldReturnCorrectResult () {
+    void secondPreemptiveDatasetShouldReturnCorrectResult() {
         SchrageParameters p = SchrageParameters
                 .builder()
-                .tasks(fourthTestCase)
+                .tasks(schrageTest2)
+                .preemptive(true)
                 .build();
         Permutation result = schrage.solve(p, solution -> {});
 
-        Assertions.assertThat(result.cmax()).isLessThan(fourthTestCaseWorstCmax);
-        Assertions.assertThat(result.cmax()).isLessThanOrEqualTo(fourthTestCaseAcceptableCmax);
-        Assertions.assertThat(result.cmax()).isGreaterThanOrEqualTo(fourthTestCaseBestCmax);
-        Assertions.assertThat(result.cmax()).isEqualTo(34444);
+        Assertions.assertThat(result.cmax()).isEqualTo(schragePreemptive2Cmax);
+    }
+
+    @Test
+    void thirdPreemptiveDatasetShouldReturnCorrectResult() {
+        SchrageParameters p = SchrageParameters
+                .builder()
+                .tasks(schrageTest3)
+                .preemptive(true)
+                .build();
+        Permutation result = schrage.solve(p, solution -> {});
+
+        Assertions.assertThat(result.cmax()).isEqualTo(schragePreemptive3Cmax);
     }
 }

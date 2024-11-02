@@ -2,6 +2,8 @@ package org.mikul17.rpq.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.mikul17.rpq.algorithms.Carlier.CarlierParameters;
+import org.mikul17.rpq.algorithms.Schrage.SchrageParameters;
 import org.mikul17.rpq.algorithms.SimulatedAnnealing.SimulatedAnnealingParameters;
 import org.mikul17.rpq.algorithms.TabuSearch.TabuSearchParameters;
 import org.mikul17.rpq.algorithms.common.Algorithm;
@@ -34,7 +36,13 @@ public class AlgorithmService {
         AlgorithmName algorithmName = request.algorithm();
         Algorithm<AlgorithmParameters, BatchedSolution> algorithm = AlgorithmFactory.createAlgorithm(algorithmName);
 
-        AlgorithmParameters parameters = createAlgorithmParameters(request);
+        AlgorithmParameters parameters;
+        try{
+            parameters = createAlgorithmParameters(request);
+        } catch (UnsupportedOperationException e) {
+            log.error("Error creating algorithm parameters", e);
+            throw new IllegalArgumentException("Error creating algorithm parameters");
+        }
 
         Consumer<BatchedSolution> solutionConsumer = batchSolution -> simpMessagingTemplate.convertAndSend("/scheduler/solution/" + sessionId, batchSolution);
 
@@ -96,10 +104,16 @@ public class AlgorithmService {
                         .build();
                 tsParams.fromMap(request.parameters());
                 return tsParams;
-            case CARLIER:
-                throw new UnsupportedOperationException("Carlier not implemented yet");
             case SCHRAGE:
-                throw new UnsupportedOperationException("Schrage not implemented yet");
+                SchrageParameters schrageParams = SchrageParameters.builder()
+                        .tasks(request.tasks())
+                        .build();
+                schrageParams.fromMap(request.parameters());
+                return schrageParams;
+            case CARLIER:
+                return CarlierParameters.builder()
+                        .tasks(request.tasks())
+                        .build();
             default:
                 throw new IllegalArgumentException("Unknown algorithm: " + request.algorithm());
         }

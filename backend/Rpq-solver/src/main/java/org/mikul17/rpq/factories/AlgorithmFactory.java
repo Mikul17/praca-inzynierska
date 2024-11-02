@@ -1,5 +1,6 @@
 package org.mikul17.rpq.factories;
 
+import org.mikul17.rpq.algorithms.Carlier.Carlier;
 import org.mikul17.rpq.algorithms.Schrage.Schrage;
 import org.mikul17.rpq.algorithms.SimulatedAnnealing.SimulatedAnnealing;
 import org.mikul17.rpq.algorithms.TabuSearch.TabuSearch;
@@ -16,6 +17,7 @@ public class AlgorithmFactory {
             case SIMULATED_ANNEALING -> (Algorithm<T, S>) new SimulatedAnnealing();
             case TABU_SEARCH -> (Algorithm<T, S>) new TabuSearch();
             case SCHRAGE -> (Algorithm<T, S>) new Schrage();
+            case CARLIER -> (Algorithm<T, S>) new Carlier();
             default -> throw new IllegalArgumentException("Unknown algorithm: " + algorithmName);
         };
     }

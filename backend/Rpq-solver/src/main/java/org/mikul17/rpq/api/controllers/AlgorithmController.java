@@ -28,7 +28,11 @@ public class AlgorithmController {
         } catch (UnableToStartConnectionException e) {
             log.error("Error starting algorithm", e);
             return ResponseEntity.status(500).body(e.getMessage());
-        } catch (Exception e) {
+        }catch (UnsupportedOperationException e) {
+            log.error("Error creating algorithm parameters", e);
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+        catch (Exception e) {
             log.error("Error starting algorithm", e);
             return ResponseEntity.status(500).body("Error starting algorithm");
         }
