@@ -1,11 +1,15 @@
 package org.mikul17.rpq.algorithms.Carlier;
 
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.mikul17.rpq.algorithms.common.Algorithm;
 import org.mikul17.rpq.algorithms.common.Permutation;
+import org.mikul17.rpq.algorithms.common.Solution;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -19,19 +23,20 @@ public class Carlier implements Algorithm<CarlierParameters, CarlierBatchedSolut
     private Permutation bestPermutation;
 
     @Override
-    public Permutation solve(CarlierParameters parameters, Consumer<CarlierBatchedSolution> stream) {
+    public Permutation solve (CarlierParameters parameters, Consumer<CarlierBatchedSolution> stream) {
         List<ModifiableTask> tasks = parameters.getTasks().stream()
                 .map(t -> new ModifiableTask(t.id(), t.r(), t.p(), t.q()))
                 .collect(Collectors.toList());
         ub = Integer.MAX_VALUE;
         bestPermutation = null;
 
-        SolutionNode rootNode = new SolutionNode(null, tasks, null, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        SolutionNode rootNode = new SolutionNode(null, null, Integer.MAX_VALUE, Integer.MAX_VALUE);
         carlier(tasks, stream, rootNode);
         return bestPermutation;
     }
 
-    private void carlier(List<ModifiableTask> tasks, Consumer<CarlierBatchedSolution> stream, SolutionNode currentNode) {
+    @SneakyThrows
+    private void carlier (List<ModifiableTask> tasks, Consumer<CarlierBatchedSolution> stream, SolutionNode currentNode) {
         List<ScheduledTask> schedule = new ArrayList<>();
         Permutation perm = schrage(tasks, schedule);
         int u = perm.cmax();
@@ -44,8 +49,10 @@ public class Carlier implements Algorithm<CarlierParameters, CarlierBatchedSolut
             bestPermutation = perm;
         }
 
-
-        CarlierBatchedSolution solution = new CarlierBatchedSolution(perm, ub, currentNode);
+        CarlierBatchedSolution solution = new CarlierBatchedSolution();
+        solution.setUb(ub);
+        solution.setNode(currentNode);
+        solution.setBestSolution(new Solution(bestPermutation.cmax(), bestPermutation.permutation()));
         stream.accept(solution);
 
         List<ScheduledTask> criticalPath = findCriticalPath(schedule);
@@ -54,7 +61,11 @@ public class Carlier implements Algorithm<CarlierParameters, CarlierBatchedSolut
         }
 
         ScheduledTask taskB = criticalPath.get(criticalPath.size() - 1);
-        ScheduledTask taskC = IntStream.iterate(criticalPath.size() - 1, i -> i >= 0, i -> i - 1).mapToObj(criticalPath::get).filter(task -> task.getQ() < taskB.getQ()).findFirst().orElse(null);
+        ScheduledTask taskC = IntStream.iterate(criticalPath.size() - 1, i -> i >= 0, i -> i - 1)
+                .mapToObj(criticalPath::get)
+                .filter(task -> task.getQ() < taskB.getQ())
+                .findFirst()
+                .orElse(null);
 
         if (taskC == null) {
             return;
@@ -86,11 +97,19 @@ public class Carlier implements Algorithm<CarlierParameters, CarlierBatchedSolut
 
         int lb = schrageWithPreemption(tasksCopy);
 
-        SolutionNode leftChild = new SolutionNode(currentNode, tasksCopy, null, ub, lb);
+        SolutionNode leftChild = new SolutionNode(currentNode, null, ub, lb);
         currentNode.addChild(leftChild);
+
+        solution = new CarlierBatchedSolution();
+        solution.setUb(ub);
+        solution.setNode(leftChild);
+        solution.setBestSolution(new Solution(bestPermutation.cmax(), bestPermutation.permutation()));
+        stream.accept(solution);
 
         if (lb < ub) {
             carlier(tasksCopy, stream, leftChild);
+        } else {
+            leftChild.setPruned(true);
         }
 
         taskCOriginal.setR(originalR);
@@ -102,23 +121,31 @@ public class Carlier implements Algorithm<CarlierParameters, CarlierBatchedSolut
 
         lb = schrageWithPreemption(tasksCopy);
 
-        SolutionNode rightChild = new SolutionNode(currentNode, tasksCopy, null, ub, lb);
+        SolutionNode rightChild = new SolutionNode(currentNode, null, ub, lb);
         currentNode.addChild(rightChild);
+
+        solution = new CarlierBatchedSolution();
+        solution.setUb(ub);
+        solution.setNode(rightChild);
+        solution.setBestSolution(new Solution(bestPermutation.cmax(), bestPermutation.permutation()));
+        stream.accept(solution);
 
         if (lb < ub) {
             carlier(tasksCopy, stream, rightChild);
+        } else {
+            rightChild.setPruned(true);
         }
 
         taskCOriginal.setQ(originalQ);
     }
 
-    private List<ModifiableTask> copyTasks(List<ModifiableTask> tasks) {
+    private List<ModifiableTask> copyTasks (List<ModifiableTask> tasks) {
         return tasks.stream()
                 .map(t -> new ModifiableTask(t.getId(), t.getR(), t.getP(), t.getQ()))
                 .collect(Collectors.toList());
     }
 
-    private Permutation schrage(List<ModifiableTask> tasks, List<ScheduledTask> schedule) {
+    private Permutation schrage (List<ModifiableTask> tasks, List<ScheduledTask> schedule) {
         List<Integer> permutation = new ArrayList<>();
 
         PriorityQueue<ModifiableTask> readyQueue = new PriorityQueue<>(Comparator.comparing(ModifiableTask::getQ).reversed());
@@ -147,7 +174,7 @@ public class Carlier implements Algorithm<CarlierParameters, CarlierBatchedSolut
         return new Permutation(cmax, permutation);
     }
 
-    private int schrageWithPreemption(List<ModifiableTask> tasks) {
+    private int schrageWithPreemption (List<ModifiableTask> tasks) {
         PriorityQueue<ModifiableTask> readyQueue = new PriorityQueue<>(Comparator.comparing(ModifiableTask::getQ).reversed());
         PriorityQueue<ModifiableTask> notReadyQueue = new PriorityQueue<>(Comparator.comparing(ModifiableTask::getR));
 
@@ -180,7 +207,7 @@ public class Carlier implements Algorithm<CarlierParameters, CarlierBatchedSolut
         return cmax;
     }
 
-    private List<ScheduledTask> findCriticalPath(List<ScheduledTask> schedule) {
+    private List<ScheduledTask> findCriticalPath (List<ScheduledTask> schedule) {
         LinkedList<ScheduledTask> criticalPath = new LinkedList<>();
         int cmax = schedule.stream()
                 .mapToInt(t -> t.getCompletionTime() + t.getQ())
@@ -230,48 +257,48 @@ public class Carlier implements Algorithm<CarlierParameters, CarlierBatchedSolut
         private final int startTime;
         private final int completionTime;
 
-        public ScheduledTask(ModifiableTask task, int startTime) {
+        public ScheduledTask (ModifiableTask task, int startTime) {
             this.task = task;
             this.startTime = startTime;
             this.completionTime = startTime + task.getP();
         }
 
-        public int getId() {
+        public int getId () {
             return task.getId();
         }
 
-        public int getR() {
+        public int getR () {
             return task.getR();
         }
 
-        public int getP() {
+        public int getP () {
             return task.getP();
         }
 
-        public int getQ() {
+        public int getQ () {
             return task.getQ();
         }
     }
 
     @Getter
     @Setter
+    @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
     public static class SolutionNode {
         private final SolutionNode parent;
-        private final List<ModifiableTask> tasks;
+        private final List<SolutionNode> children = new ArrayList<>();
         private Permutation permutation;
         private int ub;
         private int lb;
-        private final List<SolutionNode> children = new ArrayList<>();
+        private boolean pruned = false;
 
-        public SolutionNode(SolutionNode parent, List<ModifiableTask> tasks, Permutation permutation, int ub, int lb) {
+        public SolutionNode (SolutionNode parent, Permutation permutation, int ub, int lb) {
             this.parent = parent;
-            this.tasks = tasks;
             this.permutation = permutation;
             this.ub = ub;
             this.lb = lb;
         }
 
-        public void addChild(SolutionNode child) {
+        public void addChild (SolutionNode child) {
             children.add(child);
         }
     }

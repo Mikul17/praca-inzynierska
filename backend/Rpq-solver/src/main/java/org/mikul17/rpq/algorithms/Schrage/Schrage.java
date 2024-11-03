@@ -1,6 +1,7 @@
 package org.mikul17.rpq.algorithms.Schrage;
 
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.mikul17.rpq.algorithms.common.*;
 
 import java.util.*;
@@ -16,6 +17,7 @@ public class Schrage implements Algorithm<SchrageParameters, SchrageBatchedSolut
         }
     }
 
+    @SneakyThrows
     private Permutation solveWithPreemption(SchrageParameters parameters, Consumer<SchrageBatchedSolution> solutionConsumer) {
         Solution solution = new Solution();
         SchrageBatchedSolution batchedSolution = new SchrageBatchedSolution();
@@ -58,14 +60,19 @@ public class Schrage implements Algorithm<SchrageParameters, SchrageBatchedSolut
 
                 solution.setBestCmax(cmax);
                 solution.setBestOrder(new ArrayList<>(permutation));
+                batchedSolution.setQueueFromModifiableTask(readyQueue);
+                batchedSolution.setQueueFromModifiableTask(notReadyQueue);
                 batchedSolution.setBestSolution(solution);
                 solutionConsumer.accept(batchedSolution);
+                batchedSolution = new SchrageBatchedSolution();
+                Thread.sleep(1000);
             }
         }
 
         return Permutation.fromId(cmax, permutation);
     }
 
+    @SneakyThrows
     private Permutation solveSchrage(SchrageParameters parameters, Consumer<SchrageBatchedSolution> solutionConsumer){
         Solution solution = new Solution();
         SchrageBatchedSolution batchedSolution = new SchrageBatchedSolution();
@@ -96,8 +103,12 @@ public class Schrage implements Algorithm<SchrageParameters, SchrageBatchedSolut
 
                 solution.setBestCmax(cmax);
                 solution.setBestOrder(new ArrayList<>(permutation));
+                batchedSolution.setQueueFromTask(readyQueue);
+                batchedSolution.setQueueFromTask(notReadyQueue);
                 batchedSolution.setBestSolution(solution);
                 solutionConsumer.accept(batchedSolution);
+                batchedSolution = new SchrageBatchedSolution();
+                Thread.sleep(1000);
             }
         }
 
