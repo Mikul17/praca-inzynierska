@@ -2,6 +2,8 @@ package org.mikul17.rpq.services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mikul17.rpq.algorithms.Carlier.CarlierParameters;
+import org.mikul17.rpq.algorithms.Schrage.SchrageParameters;
 import org.mikul17.rpq.algorithms.SimulatedAnnealing.SimulatedAnnealingParameters;
 import org.mikul17.rpq.algorithms.TabuSearch.TabuSearchParameters;
 import org.mikul17.rpq.algorithms.common.*;
@@ -174,26 +176,25 @@ class AlgorithmServiceTest {
                 "coolingRate", 0.95
         );
         Map<String, Object> parameters2 = Map.of(
-                "maxIterations", 500,
-                "tabuListSize", 10
+                "preemptive", true
         );
 
         ScheduleRequest request1 = new ScheduleRequest(AlgorithmName.SIMULATED_ANNEALING, null, parameters1);
-        ScheduleRequest request2 = new ScheduleRequest(AlgorithmName.TABU_SEARCH, null, parameters2);
+        ScheduleRequest request2 = new ScheduleRequest(AlgorithmName.CARLIER, null, parameters2);
 
         SimulatedAnnealingParameters saParams = SimulatedAnnealingParameters.builder()
                 .tasks(request1.tasks())
                 .build();
         saParams.fromMap(parameters1);
 
-        TabuSearchParameters tsParams = TabuSearchParameters.builder()
+        SchrageParameters schrageParams = SchrageParameters.builder()
                 .tasks(request2.tasks())
                 .build();
-        tsParams.fromMap(parameters2);
+        schrageParams.fromMap(parameters2);
 
         AlgorithmService spyAlgorithmService = spy(algorithmService);
         doReturn(saParams).when(spyAlgorithmService).createAlgorithmParameters(request1);
-        doReturn(tsParams).when(spyAlgorithmService).createAlgorithmParameters(request2);
+        doReturn(schrageParams).when(spyAlgorithmService).createAlgorithmParameters(request2);
 
         spyAlgorithmService.startAlgorithm(request1, sessionId1);
         spyAlgorithmService.startAlgorithm(request2, sessionId2);

@@ -65,7 +65,7 @@ public class Schrage implements Algorithm<SchrageParameters, SchrageBatchedSolut
                 batchedSolution.setBestSolution(solution);
                 solutionConsumer.accept(batchedSolution);
                 batchedSolution = new SchrageBatchedSolution();
-                Thread.sleep(1000);
+//                Thread.sleep(1000);
             }
         }
 
@@ -108,7 +108,7 @@ public class Schrage implements Algorithm<SchrageParameters, SchrageBatchedSolut
                 batchedSolution.setBestSolution(solution);
                 solutionConsumer.accept(batchedSolution);
                 batchedSolution = new SchrageBatchedSolution();
-                Thread.sleep(1000);
+//                Thread.sleep(1000);
             }
         }
 

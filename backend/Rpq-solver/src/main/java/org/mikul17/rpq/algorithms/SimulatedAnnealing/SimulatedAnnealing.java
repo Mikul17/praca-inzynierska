@@ -60,7 +60,7 @@ public class SimulatedAnnealing implements Algorithm<SimulatedAnnealingParameter
                 batchedSolution.setBestSolution(bestSolution);
                 solutionConsumer.accept(batchedSolution);
                 batchedSolution = new SimulatedAnnealingaBatchedSolution();
-                Thread.sleep(4000);
+//                Thread.sleep(4000);
             }
 
             if(parameters.resetTemperatureFlag) {
