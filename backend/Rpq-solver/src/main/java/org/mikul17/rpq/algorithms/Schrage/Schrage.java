@@ -1,53 +1,218 @@
 package org.mikul17.rpq.algorithms.Schrage;
 
-import org.mikul17.rpq.algorithms.common.Permutation;
-import org.mikul17.rpq.algorithms.common.Solver;
-import org.mikul17.rpq.algorithms.common.Task;
+import lombok.Getter;
+import org.mikul17.rpq.algorithms.common.*;
 
-import java.util.Comparator;
-import java.util.PriorityQueue;
+import java.util.*;
 import java.util.function.Consumer;
 
-public class Schrage implements Solver<SchrageParameters, SchrageSolution> {
+public class Schrage implements Algorithm<SchrageParameters, SchrageBatchedSolution> {
 
-    @Override
-    public SchrageSolution solve (SchrageParameters parameters, Consumer<SchrageSolution> solutionConsumer) {
-        SchrageSolution solution = new SchrageSolution();
+    public Permutation solve(SchrageParameters parameters, Consumer<SchrageBatchedSolution> solutionConsumer) {
+        if (parameters.isPreemptive()) {
+            return solveWithPreemption(parameters, solutionConsumer);
+        } else {
+            return solveSchrage(parameters, solutionConsumer);
+        }
+    }
 
-        PriorityQueue<Task> readyQueue = new PriorityQueue<>(
-                Comparator.comparing(Task::q).reversed()
-        );
-        PriorityQueue<Task> notReadyQueue = new PriorityQueue<>(
-                Comparator.comparing(Task::r)
-        );
+    private Permutation solveWithPreemption(SchrageParameters parameters, Consumer<SchrageBatchedSolution> solutionConsumer) {
+        Solution solution = new Solution();
+        SchrageBatchedSolution batchedSolution = new SchrageBatchedSolution();
+        List<Integer> permutation = new ArrayList<>();
 
-        notReadyQueue.addAll(parameters.getTasks());
-        Permutation bestPermutation = new Permutation();
+        List<ModifiableTask> modifiableTasks = parameters.getTasks().stream()
+                .map(task -> new ModifiableTask(task.id(), task.r(), task.p(), task.q()))
+                .toList();
+
+        PriorityQueue<ModifiableTask> readyQueue = new PriorityQueue<>(Comparator.comparing(ModifiableTask::getQ).reversed());
+        PriorityQueue<ModifiableTask> notReadyQueue = new PriorityQueue<>(Comparator.comparing(ModifiableTask::getR));
+
+        notReadyQueue.addAll(modifiableTasks);
         int currentTime = 0;
         int cmax = 0;
-        long startTime = System.nanoTime();
+        ModifiableTask currentTask = null;
+
+        while (!readyQueue.isEmpty() || !notReadyQueue.isEmpty()) {
+            while (!notReadyQueue.isEmpty() && notReadyQueue.peek().r <= currentTime) {
+                ModifiableTask task = notReadyQueue.poll();
+                readyQueue.add(task);
+
+                if (currentTask != null && task.q > currentTask.q) {
+                    currentTask.p = (currentTime - task.r);
+                    currentTime = task.r;
+                    if(currentTask.p > 0) {
+                        readyQueue.add(currentTask);
+                    }
+                    break;
+                }
+            }
+
+            if (readyQueue.isEmpty()) {
+                currentTime = Math.max(currentTime, notReadyQueue.peek().r);
+            } else {
+                currentTask = readyQueue.poll();
+                currentTime += currentTask.p;
+                permutation.add(currentTask.getId());
+                cmax = Math.max(cmax, currentTime + currentTask.getQ());
+
+                solution.setBestCmax(cmax);
+                solution.setBestOrder(new ArrayList<>(permutation));
+                batchedSolution.setBestSolution(solution);
+                solutionConsumer.accept(batchedSolution);
+            }
+        }
+
+        return Permutation.fromId(cmax, permutation);
+    }
+
+    private Permutation solveSchrage(SchrageParameters parameters, Consumer<SchrageBatchedSolution> solutionConsumer){
+        Solution solution = new Solution();
+        SchrageBatchedSolution batchedSolution = new SchrageBatchedSolution();
+        List<Integer> permutation = new ArrayList<>();
+
+        List<Task> tasks = new ArrayList<>(parameters.getTasks());
+
+        PriorityQueue<Task> readyQueue = new PriorityQueue<>(Comparator.comparing(Task::q).reversed());
+        PriorityQueue<Task> notReadyQueue = new PriorityQueue<>(Comparator.comparing(Task::r));
+
+        notReadyQueue.addAll(tasks);
+        int currentTime = 0;
+        int cmax = 0;
 
         while (!readyQueue.isEmpty() || !notReadyQueue.isEmpty()) {
             while (!notReadyQueue.isEmpty() && notReadyQueue.peek().r() <= currentTime) {
                 readyQueue.add(notReadyQueue.poll());
             }
             if (readyQueue.isEmpty()) {
-                currentTime = notReadyQueue.peek().r();
+                assert notReadyQueue.peek() != null;
+                currentTime = Math.max(currentTime, notReadyQueue.peek().r());
             } else {
                 Task task = readyQueue.poll();
                 currentTime += task.p();
-                bestPermutation.add(task);
+                permutation.add(task.id());
                 int taskEnd = currentTime + task.q();
                 cmax = Math.max(cmax, taskEnd);
+
+                solution.setBestCmax(cmax);
+                solution.setBestOrder(new ArrayList<>(permutation));
+                batchedSolution.setBestSolution(solution);
+                solutionConsumer.accept(batchedSolution);
             }
         }
 
-        long endTime = System.nanoTime();
-        long duration = (endTime - startTime);
-        solution.setBestPermutation(Permutation.of(bestPermutation.getPermutation()));
-        solution.setBestCmax(cmax);
-        solution.setDuration(duration);
+        return Permutation.fromId(cmax, permutation);
+    }
 
-        return solution;
+    //WITHOUT PREEMPTION
+    //    @SneakyThrows
+//    @Override
+//    public Permutation solve(SchrageParameters parameters, Consumer<SchrageBatchedSolution> solutionConsumer) {
+//        Solution solution = new Solution();
+//        SchrageBatchedSolution batchedSolution = new SchrageBatchedSolution();
+//        List<Integer> permutation = new ArrayList<>();
+//
+//        List<Task> tasks = new ArrayList<>(parameters.getTasks());
+//
+//        PriorityQueue<Task> readyQueue = new PriorityQueue<>(Comparator.comparing(Task::q).reversed());
+//        PriorityQueue<Task> notReadyQueue = new PriorityQueue<>(Comparator.comparing(Task::r));
+//
+//        notReadyQueue.addAll(tasks);
+//        int currentTime = 0;
+//        int cmax = 0;
+//
+//        while (!readyQueue.isEmpty() || !notReadyQueue.isEmpty()) {
+//            while (!notReadyQueue.isEmpty() && notReadyQueue.peek().r() <= currentTime) {
+//                readyQueue.add(notReadyQueue.poll());
+//            }
+//            if (readyQueue.isEmpty()) {
+//                assert notReadyQueue.peek() != null;
+//                currentTime = Math.max(currentTime, notReadyQueue.peek().r());
+//            } else {
+//                Task task = readyQueue.poll();
+//                currentTime += task.p();
+//                permutation.add(task.id());
+//                int taskEnd = currentTime + task.q();
+//                cmax = Math.max(cmax, taskEnd);
+//
+//                solution.setBestCmax(cmax);
+//                solution.setBestOrder(new ArrayList<>(permutation));
+//                batchedSolution.setBestSolution(solution);
+//                solutionConsumer.accept(batchedSolution);
+//            }
+//        }
+//
+//        return Permutation.fromId(cmax, permutation);
+//    }
+
+
+    //WITH PREEMPTION
+//    @SneakyThrows
+//    @Override
+//    public Permutation solve(SchrageParameters parameters, Consumer<SchrageBatchedSolution> solutionConsumer) {
+//        Solution solution = new Solution();
+//        SchrageBatchedSolution batchedSolution = new SchrageBatchedSolution();
+//        List<Integer> permutation = new ArrayList<>();
+//
+//        List<ModifiableTask> modifiableTasks = parameters.getTasks().stream()
+//                .map(task -> new ModifiableTask(task.id(), task.r(), task.p(), task.q()))
+//                .toList();
+//
+//        PriorityQueue<ModifiableTask> readyQueue = new PriorityQueue<>(Comparator.comparing(ModifiableTask::getQ).reversed());
+//        PriorityQueue<ModifiableTask> notReadyQueue = new PriorityQueue<>(Comparator.comparing(ModifiableTask::getR));
+//
+//        notReadyQueue.addAll(modifiableTasks);
+//        int currentTime = 0;
+//        int cmax = 0;
+//        ModifiableTask currentTask = null;
+//
+//        while (!readyQueue.isEmpty() || !notReadyQueue.isEmpty()) {
+//            while (!notReadyQueue.isEmpty() && notReadyQueue.peek().getR() <= currentTime) {
+//                ModifiableTask task = notReadyQueue.poll();
+//                readyQueue.add(task);
+//
+//                if (currentTask != null && task.q > currentTask.q) {
+//                    currentTask.p = (currentTime - task.r);
+//                    currentTime = task.r;
+//                    if(currentTask.p > 0) {
+//                        readyQueue.add(currentTask);
+//                    }
+//                    break;
+//                }
+//            }
+//
+//            if (readyQueue.isEmpty()) {
+//                currentTime = Math.max(currentTime, notReadyQueue.peek().getR());
+//            } else {
+//                currentTask = readyQueue.poll();
+//                currentTime += currentTask.getP();
+//                permutation.add(currentTask.getId());
+//                cmax = Math.max(cmax, currentTime + currentTask.getQ());
+//
+//                solution.setBestCmax(cmax);
+//                solution.setBestOrder(new ArrayList<>(permutation));
+//                batchedSolution.setBestSolution(solution);
+//                solutionConsumer.accept(batchedSolution);
+//            }
+//        }
+//
+//        return Permutation.fromId(cmax, permutation);
+//    }
+
+    @Getter
+    public class ModifiableTask {
+        private final int id;
+        private final int r;
+        private int p;
+        private final int q;
+
+        public ModifiableTask (int id, int r, int p, int q) {
+            this.id = id;
+            this.r = r;
+            this.p = p;
+            this.q = q;
+        }
+
     }
 }
+

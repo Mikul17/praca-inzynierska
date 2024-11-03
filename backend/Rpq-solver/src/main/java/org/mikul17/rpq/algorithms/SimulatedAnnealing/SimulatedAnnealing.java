@@ -1,8 +1,7 @@
 package org.mikul17.rpq.algorithms.SimulatedAnnealing;
 
-import org.mikul17.rpq.algorithms.common.Permutation;
-import org.mikul17.rpq.algorithms.common.Solver;
-import org.mikul17.rpq.algorithms.common.Task;
+import lombok.SneakyThrows;
+import org.mikul17.rpq.algorithms.common.*;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -12,56 +11,66 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 @Component
-public class SimulatedAnnealing
-        implements Solver<SimulatedAnnealingParameters, SimulatedAnnealingSolution> {
+public class SimulatedAnnealing implements Algorithm<SimulatedAnnealingParameters, SimulatedAnnealingaBatchedSolution> {
     private final Random random = new Random();
 
+    @SneakyThrows
     @Override
-    public SimulatedAnnealingSolution solve (SimulatedAnnealingParameters parameters, Consumer<SimulatedAnnealingSolution> solutionConsumer) {
-        SimulatedAnnealingSolution solution = new SimulatedAnnealingSolution();
-        long startTime = System.nanoTime();
-
+    public Permutation solve (SimulatedAnnealingParameters parameters, Consumer<SimulatedAnnealingaBatchedSolution> solutionConsumer) {
+        SimulatedAnnealingaBatchedSolution batchedSolution = new SimulatedAnnealingaBatchedSolution();
+        Solution bestSolution = new Solution();
         /* Temporary variables used in algorithm */
         List<Task> copy = new ArrayList<>(parameters.getTasks());
-        Permutation bestPermutation = Permutation.of(parameters.getTasks());
+        Permutation bestPermutation = null;
         int previousCmax = calculateCmax(parameters.getTasks());
         int bestCmax = Integer.MAX_VALUE;
         double currentTemperature = parameters.initialTemperature;
-        solution.temperature.add(parameters.initialTemperature);
 
         /* main loop of algorithm */
         for (int i = 0; i < parameters.maxIterations; i++) {
             List<Task> candidate = new ArrayList<>(copy);
             swapTwoRandomElements(candidate);
             int newCmax = calculateCmax(candidate);
+
             double acceptanceProbability = acceptanceProbability(
                     previousCmax,
                     newCmax,
-                    solution.temperature.get(i)
+                    currentTemperature
             );
-            solution.addPermutation(candidate);
-            solution.addProbability(acceptanceProbability);
+
+            batchedSolution.addPermutation(candidate, newCmax);
+            batchedSolution.addProbability(acceptanceProbability);
 
             if (random.nextDouble(1.0) < acceptanceProbability) {
                 previousCmax = newCmax;
                 Collections.copy(copy, candidate);
                 if (newCmax < bestCmax) {
-                    bestPermutation = Permutation.of(candidate);
                     bestCmax = newCmax;
+                    bestPermutation = Permutation.fromTasks(bestCmax, candidate);
                 }
             }
-            currentTemperature *= parameters.coolingRate;
-            solution.addTemperature(currentTemperature);
-            solutionConsumer.accept(solution);
+            if(!parameters.stopTemperatureChangeFlag) {
+                currentTemperature *= parameters.coolingRate;
+            }
+            batchedSolution.addTemperature(currentTemperature);
+
+            if(i % 100 == 0) {
+                bestSolution.setBestCmax(bestCmax);
+                bestSolution.setBestOrder(bestPermutation != null ? bestPermutation.permutation() : null);
+                batchedSolution.setBestSolution(bestSolution);
+                solutionConsumer.accept(batchedSolution);
+                batchedSolution = new SimulatedAnnealingaBatchedSolution();
+                Thread.sleep(4000);
+            }
+
+            if(parameters.resetTemperatureFlag) {
+                currentTemperature = parameters.initialTemperature;
+                parameters.resetTemperatureFlag = false;
+            }
+
+            parameters.applyPendingChanges();
         }
-        long endTime = System.nanoTime();
-        long duration = endTime - startTime;
-
-        solution.setBestCmax(bestCmax);
-        solution.setBestPermutation(bestPermutation);
-        solution.setDuration(duration);
-
-        return solution;
+        return bestPermutation;
     }
 
     private double acceptanceProbability (int best, int current, double temperature) {
