@@ -1,8 +1,6 @@
 package org.mikul17.rpq.algorithms.TabuSearch;
 
-import lombok.Builder;
 import lombok.SneakyThrows;
-import org.mikul17.rpq.algorithms.SimulatedAnnealing.SimulatedAnnealingaBatchedSolution;
 import org.mikul17.rpq.algorithms.common.Algorithm;
 import org.mikul17.rpq.algorithms.common.Permutation;
 import org.mikul17.rpq.algorithms.common.Solution;

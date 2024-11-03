@@ -28,7 +28,7 @@ public class AlgorithmService {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
     public static final Map<String, AlgorithmRunner<?, ?>> algorithmRunners = new ConcurrentHashMap<>();
-    private final Map<String, CompletableFuture<Void>> connectionRegistry = new ConcurrentHashMap<>();
+    final Map<String, CompletableFuture<Void>> connectionRegistry = new ConcurrentHashMap<>();
     private final int CONNECTION_TIMEOUT = 30;
 
     public void startAlgorithm(ScheduleRequest request, String sessionId) {
@@ -46,7 +46,7 @@ public class AlgorithmService {
 
         Consumer<BatchedSolution> solutionConsumer = batchSolution -> simpMessagingTemplate.convertAndSend("/scheduler/solution/" + sessionId, batchSolution);
 
-        AlgorithmRunner<?, ?> runner = new AlgorithmRunner<>(algorithm, parameters, solutionConsumer, sessionId);
+        AlgorithmRunner<?, ?> runner = new AlgorithmRunner<>(algorithm, parameters, solutionConsumer);
         algorithmRunners.put(sessionId, runner);
 
 
@@ -90,7 +90,7 @@ public class AlgorithmService {
         }
     }
 
-    private AlgorithmParameters createAlgorithmParameters (ScheduleRequest request) {
+    protected AlgorithmParameters createAlgorithmParameters (ScheduleRequest request) {
         switch (request.algorithm()) {
             case SIMULATED_ANNEALING:
                 SimulatedAnnealingParameters saParams = SimulatedAnnealingParameters.builder()
@@ -119,7 +119,7 @@ public class AlgorithmService {
         }
     }
 
-    private AlgorithmRunner<?,?> getCorrespondingAlgorithmRunner(String sessionId) {
+    AlgorithmRunner<?,?> getCorrespondingAlgorithmRunner(String sessionId) {
         AlgorithmRunner<?, ?> runner = algorithmRunners.get(sessionId);
         if (runner != null) {
             return runner;

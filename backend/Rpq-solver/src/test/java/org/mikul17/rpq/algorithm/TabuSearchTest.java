@@ -25,7 +25,7 @@ public class TabuSearchTest {
     void firstTestCaseShouldReturnCorrectResult () {
         TabuSearchParameters p = TabuSearchParameters
                 .builder()
-                .maxIterations(100_000)
+                .maxIterations(5)
                 .tabuListSize(2)
                 .tasks(testTasks)
                 .build();

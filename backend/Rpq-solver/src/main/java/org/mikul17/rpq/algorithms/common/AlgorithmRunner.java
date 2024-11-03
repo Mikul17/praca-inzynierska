@@ -13,7 +13,6 @@ public class AlgorithmRunner<T extends AlgorithmParameters, S extends BatchedSol
     private final Algorithm<T, S> algorithm;
     private final T parameters;
     private final Consumer<BatchedSolution> solutionConsumer;
-    private final String sessionId;
 
     public void run() {
         algorithm.solve(parameters, solutionConsumer::accept);

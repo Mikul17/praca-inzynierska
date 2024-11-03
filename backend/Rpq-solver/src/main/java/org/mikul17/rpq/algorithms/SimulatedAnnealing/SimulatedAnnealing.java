@@ -51,7 +51,6 @@ public class SimulatedAnnealing implements Algorithm<SimulatedAnnealingParameter
             }
             if(!parameters.stopTemperatureChangeFlag) {
                 currentTemperature *= parameters.coolingRate;
-                System.out.println("Current temperature: " + currentTemperature);
             }
             batchedSolution.addTemperature(currentTemperature);
 
