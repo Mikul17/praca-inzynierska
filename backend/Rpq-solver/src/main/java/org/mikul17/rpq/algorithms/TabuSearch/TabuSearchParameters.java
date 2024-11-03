@@ -27,6 +27,10 @@ public class TabuSearchParameters extends AlgorithmParameters {
     public void fromMap (Map<String, Object> map) {
         maxIterations = (int) map.get("maxIterations");
         tabuListSize = (int) map.get("tabuListSize");
+        if(tabuListSize >= tasks.size() - 1) {
+            tabuListSize = tasks.size();
+            throw new IllegalArgumentException("Tabu list size cannot be greater than number of tasks - 1");
+        }
     }
 
     @Override
