@@ -3,6 +3,7 @@ package org.mikul17.rpq.algorithms.common;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mikul17.rpq.algorithms.SimulatedAnnealing.SimulatedAnnealingParameters;
+import org.mikul17.rpq.algorithms.TabuSearch.TabuSearchParameters;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -43,6 +44,14 @@ public class AlgorithmRunner<T extends AlgorithmParameters, S extends BatchedSol
             ((SimulatedAnnealingParameters) parameters).resumeTemperatureChange();
         } else {
             log.error("Cannot resume temperature change for algorithm: {}", algorithm.getClass().getSimpleName());
+        }
+    }
+
+    public void clearTabuList() {
+        if(parameters instanceof TabuSearchParameters) {
+            ((TabuSearchParameters) parameters).clearTabuList();
+        } else {
+            log.error("Cannot clear tabu list for algorithm: {}", algorithm.getClass().getSimpleName());
         }
     }
 }

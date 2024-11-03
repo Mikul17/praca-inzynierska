@@ -36,4 +36,9 @@ public class WebSocketController {
         algorithmService.simulatedAnnealingStopTemperatureChange(message.getSessionId(), message.isReset());
     }
 
+    @MessageMapping("/scheduler/ts/clear_tabu_list")
+    public void clearTabuList (@Payload String sessionId) {
+        algorithmService.tabuSearchClearTabuList(sessionId);
+    }
+
 }

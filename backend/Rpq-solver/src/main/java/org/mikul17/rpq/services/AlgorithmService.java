@@ -148,4 +148,12 @@ public class AlgorithmService {
             }
         }
     }
+
+    public void tabuSearchClearTabuList(String sessionId) {
+        AlgorithmRunner<?, ?> runner = getCorrespondingAlgorithmRunner(sessionId);
+        if (runner != null) {
+            log.info("[Tabu Search] Clearing tabu list for sessionId: {}", sessionId);
+            runner.clearTabuList();
+        }
+    }
 }

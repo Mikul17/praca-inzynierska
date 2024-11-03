@@ -61,9 +61,9 @@ public class TabuSearch implements Algorithm<TabuSearchParameters, TabuSearchBat
             batchedSolution = new TabuSearchBatchedSolution();
             Thread.sleep(4000);
 
-            if(parameters.clearTabuList) {
+            if(parameters.clearTabuListFlag) {
                 tabuList.clear();
-                parameters.clearTabuList = false;
+                parameters.clearTabuListFlag = false;
             }
 
             parameters.applyPendingChanges();

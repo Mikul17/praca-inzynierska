@@ -1,7 +1,6 @@
 package org.mikul17.rpq.algorithms.TabuSearch;
 
 import lombok.experimental.SuperBuilder;
-import org.mikul17.rpq.algorithms.SimulatedAnnealing.SimulatedAnnealingParameters;
 import org.mikul17.rpq.algorithms.common.AlgorithmParameters;
 
 import java.util.Map;
@@ -18,7 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class TabuSearchParameters extends AlgorithmParameters {
     protected int maxIterations;
     protected volatile int tabuListSize;
-    protected volatile boolean clearTabuList = false;
+    protected volatile boolean clearTabuListFlag = false;
     protected volatile boolean resizeTabuList = false;
 
     private final ReentrantLock lock = new ReentrantLock();
@@ -64,7 +63,7 @@ public class TabuSearchParameters extends AlgorithmParameters {
     public void clearTabuList() {
         lock.lock();
         try {
-            clearTabuList = true;
+            clearTabuListFlag = true;
         } finally {
             lock.unlock();
         }
