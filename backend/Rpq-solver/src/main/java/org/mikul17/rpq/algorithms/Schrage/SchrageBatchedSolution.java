@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.mikul17.rpq.algorithms.common.BatchedSolution;
 import org.mikul17.rpq.algorithms.common.Task;
-
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
@@ -21,5 +20,4 @@ public class SchrageBatchedSolution extends BatchedSolution {
     public void setQueueFromTask (PriorityQueue<Task> queue) {
         queue.forEach(task -> this.notReadyQueue.add(task.id()));
     }
-
 }

@@ -47,6 +47,7 @@ public class TabuSearch implements Algorithm<TabuSearchParameters, TabuSearchBat
             int currentlyBestCmax = result.moveCmax();
             Collections.swap(copy, result.firstTask(), result.secondTask());
             addMoveToTabuList(result, tabuList, parameters.tabuListSize);
+            batchedSolution.addTabuMove(result);
 
             if (currentlyBestCmax < bestCmax) {
                 bestCmax = currentlyBestCmax;

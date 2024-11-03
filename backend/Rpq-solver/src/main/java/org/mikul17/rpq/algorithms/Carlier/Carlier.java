@@ -10,7 +10,6 @@ import lombok.SneakyThrows;
 import org.mikul17.rpq.algorithms.common.Algorithm;
 import org.mikul17.rpq.algorithms.common.Permutation;
 import org.mikul17.rpq.algorithms.common.Solution;
-
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;

@@ -16,5 +16,4 @@ public class TabuSearchBatchedSolution extends BatchedSolution {
        this.tabuList.clear();
        this.tabuList.addAll(tabuList);
    }
-
 }

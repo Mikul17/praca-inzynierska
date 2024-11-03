@@ -72,4 +72,44 @@ public class TabuSearchParameters extends AlgorithmParameters {
             lock.unlock();
         }
     }
+
+    @Override
+    public void updateFromMap (Map<String, Object> map) {
+        lock.lock();
+        try {
+            if (pendingChanges == null) {
+                pendingChanges = TabuSearchParameters.builder()
+                        .maxIterations(maxIterations)
+                        .tabuListSize(tabuListSize)
+                        .build();
+            }
+            if (map.containsKey("tabuListSize")) {
+                pendingChanges.tabuListSize = (int) map.get("tabuListSize");
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void applyPendingChanges() {
+        lock.lock();
+        try {
+            if (pendingChanges != null) {
+                tabuListSize = pendingChanges.tabuListSize;
+                resizeTabuList = true;
+            }
+            pendingChanges = null;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void clearTabuList() {
+        lock.lock();
+        try {
+            clearTabuListFlag = true;
+        } finally {
+            lock.unlock();
+        }
+    }
 }
