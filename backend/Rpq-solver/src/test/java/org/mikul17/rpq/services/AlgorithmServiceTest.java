@@ -37,6 +37,11 @@ class AlgorithmServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    @BeforeEach
+    void clearAlgorithmRunners() {
+        AlgorithmService.algorithmRunners.clear();
+    }
+
     @Test
     void shouldSendMessageOnAlgorithmFinish() {
         String sessionId = "test-session";
@@ -101,7 +106,7 @@ class AlgorithmServiceTest {
 
         assertNotNull(AlgorithmService.algorithmRunners.get(sessionId));
         assertNotNull(spyAlgorithmService.getCorrespondingAlgorithmRunner(sessionId));
-        assertEquals(AlgorithmService.algorithmRunners.size(), 1);
+        assertEquals(1, AlgorithmService.algorithmRunners.size());
         verify(spyAlgorithmService, times(1)).getCorrespondingAlgorithmRunner(sessionId);
     }
 
