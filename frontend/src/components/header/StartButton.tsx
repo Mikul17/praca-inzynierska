@@ -1,37 +1,79 @@
+"use client";
 import { Button } from "@nextui-org/button";
-import { useEffect, useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useFile } from "@/context/FileContext";
 import Icon from "../Icon";
 import useAnimationEffect from "@/hooks/useAnimationEffect";
 import { useTaskContext } from "@/context/TaskContext";
+import { useAlgorithm } from "@/context/AlgorithmContext";
+import { startScheduler } from "@/common/api";
+import useWebSocket from "@/hooks/useWebSocket";
 
 export default function StartButton() {
   const { isFileLoaded } = useFile();
-  const { tasks, updateOrders, setOrderForAnimation, resetHistory } = useTaskContext();
+  const { currentAlgorithm } = useAlgorithm();
+  const { solutions, bestSolution, tasks, setSolutionForAnimation, updateSolution, resetRecentlyChangedTasks } = useTaskContext();
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const testOrders = [
-    [1,2,3],
-    [2,1,3],
-    [2,3,1],
-    [3,2,1]
-  ]
-  const { play, setSpeed } = useAnimationEffect({
-    totalFrames: testOrders.length -1 ,
-    initialSpeed: 1,
-    onFrameChange: (frame) => {
-      console.log("Frame: ", frame);
-      setTimeout(() => setOrderForAnimation(testOrders[frame]), 0);
+
+  const {
+    setSessionId,
+    connect
+  } = useWebSocket();
+
+  const canAdvanceFrame = useCallback(
+    (nextFrame) => {
+      return solutions[nextFrame] !== undefined;
     },
-    onAnimationStart: () => resetHistory(),
+    [solutions]
+  );
+  
+
+  const onFrameChange = useCallback(
+    (frame: number) => {
+      if (solutions[frame]) {
+        setSolutionForAnimation(solutions[frame]);
+        console.log("Frame changed to:", frame);
+      } 
+    },
+    [solutions, setSolutionForAnimation]
+  );
+
+  const { play, currentFrame, isPlaying, } = useAnimationEffect({
+    initialSpeed: 5.0,
+    onFrameChange,
+    canAdvanceFrame,
+    onAnimationStart: () => console.log("Animation started"),
+    onAnimationEnd: () => {
+      setTimeout(() => {
+        resetRecentlyChangedTasks();
+        updateSolution(bestSolution);
+      }, 0);
+    },
   });
 
+  useEffect(() => {
+    if (!isPlaying && solutions[currentFrame + 1]) {
+      play();
+    }
+  }, [solutions, isPlaying, play, currentFrame]);
 
-  const handleClick = () => {
-    updateOrders(testOrders);
-    setSpeed(1.0);
-    play();
-  }
+  useEffect(() => {
+    if (isPlaying) {
+      onFrameChange(currentFrame);
+    }
+  }, [currentFrame, onFrameChange, isPlaying]);
 
+  const newHandleClick = async () => {
+    try {
+      const response = await startScheduler(currentAlgorithm, tasks);
+      if (response) {
+        setSessionId(response);
+        connect(response);
+      }
+    } catch (error) {
+      console.error('Failed to start scheduler:', error);
+    }
+  };
 
   return (
     <Button
@@ -45,7 +87,7 @@ export default function StartButton() {
       isDisabled={!isFileLoaded}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={handleClick}
+      onClick={newHandleClick}
     >
       {isFileLoaded ? "" : "Load data first"}
       {isHovered ? "Start" : ""}

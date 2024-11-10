@@ -1,11 +1,12 @@
+"use client";
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface UseAnimationEffectProps {
   initialSpeed: number;
-  totalFrames: number;
   onFrameChange: (frame: number) => void;
   onAnimationEnd?: () => void;
   onAnimationStart?: () => void;
+  canAdvanceFrame?: (frame: number) => boolean;
 }
 
 interface UseAnimationEffectReturn {
@@ -19,64 +20,45 @@ interface UseAnimationEffectReturn {
 }
 
 const useAnimationEffect = ({
-  totalFrames,
   initialSpeed,
   onFrameChange,
   onAnimationEnd,
-  onAnimationStart
+  onAnimationStart,
+  canAdvanceFrame,
 }: UseAnimationEffectProps): UseAnimationEffectReturn => {
   const [currentFrame, setCurrentFrame] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [speed, setSpeed] = useState<number>(initialSpeed);
-  const [isAnimationOver, setIsAnimationOver] = useState<boolean>(true);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const lastFrameRef = useRef<number>(-1);
+
+  useEffect(() => {
+    onFrameChange(currentFrame);
+  }, [currentFrame, onFrameChange]);
 
   const updateFrame = useCallback(() => {
-    setCurrentFrame(prevFrame => {
+    setCurrentFrame((prevFrame) => {
       const nextFrame = prevFrame + 1;
-      if (nextFrame >= totalFrames) {
-        setIsPlaying(false);
-        setIsAnimationOver(true);
+  
+      if (canAdvanceFrame && !canAdvanceFrame(nextFrame)) {
         if (onAnimationEnd) {
           onAnimationEnd();
         }
-        return totalFrames;
+        setIsPlaying(false);
+        return prevFrame;
       }
+  
+      if (nextFrame > 200) {
+        if (onAnimationEnd) {
+          onAnimationEnd();
+        }
+        setIsPlaying(false);
+        return prevFrame;
+      }
+  
       return nextFrame;
     });
-  }, [totalFrames, onAnimationEnd]);
-
-  useEffect(() => {
-    // Only trigger `onFrameChange` if `currentFrame` has truly changed.
-    if (currentFrame !== lastFrameRef.current) {
-      onFrameChange(currentFrame);
-      lastFrameRef.current = currentFrame;
-    }
-  }, [currentFrame, onFrameChange]);
-
-  const play = useCallback(() => {
-    if (isAnimationOver) {
-      reset();
-    }
-    if (onAnimationStart) {
-      onAnimationStart();
-    }
-    setIsPlaying(true);
-    setIsAnimationOver(false);
-  }, [isAnimationOver, onAnimationStart]);
-
-  const pause = useCallback(() => {
-    setIsPlaying(false);
-  }, []);
-
-  const reset = useCallback(() => {
-    setCurrentFrame(0);
-    setIsPlaying(false);
-    lastFrameRef.current = 0;
-    onFrameChange(0);
-  }, [onFrameChange]);
+  }, [canAdvanceFrame, onAnimationEnd]);
 
   useEffect(() => {
     if (isPlaying) {
@@ -90,6 +72,23 @@ const useAnimationEffect = ({
       }
     };
   }, [isPlaying, speed, updateFrame]);
+
+  const play = useCallback(() => {
+    if (onAnimationStart) {
+      onAnimationStart();
+    }
+    setIsPlaying(true);
+  }, [onAnimationStart]);
+
+  const pause = useCallback(() => {
+    setIsPlaying(false);
+  }, []);
+
+  const reset = useCallback(() => {
+    setCurrentFrame(0);
+    setIsPlaying(false);
+    onFrameChange(0);
+  }, [onFrameChange]);
 
   return {
     currentFrame,

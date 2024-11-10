@@ -1,8 +1,5 @@
-import { useTaskContext } from "@/context/TaskContext";
+import React, { memo, useMemo } from "react";
 import Chart from "react-google-charts";
-import Image from "next/image";
-import NoDataImage from "@/icons/noData.png";
-import { useEffect, useState } from "react";
 
 interface ChartProps {
   readonly data: number[];
@@ -11,41 +8,37 @@ interface ChartProps {
   readonly yAxisTitle: string;
 }
 
-
-export default function SolutionChart({data, title, xAxisTitle, yAxisTitle}: ChartProps) {
-    const [chartData, setChartData] = useState<Array<(string | number)[]>>([]);
-
-    const mapToChartData = (data: number[]): Array<(string | number)[]> => {
-      const chartData: Array<(string | number)[]> = [[xAxisTitle, yAxisTitle]];
-      data.forEach((value, index) => {
-        chartData.push([index + 1, value]);
-      });
-      return chartData;
-    }
-
-  useEffect(() => {
+const SolutionChart = memo(function SolutionChart({ data, title, xAxisTitle, yAxisTitle }: ChartProps) {
+  const chartData = useMemo(() => {
     if (data.length > 0) {
-      setChartData(mapToChartData(data));
+      const mappedData: Array<(string | number)[]> = [[xAxisTitle, yAxisTitle]];
+      data.forEach((value, index) => {
+        mappedData.push([index + 1, value]);
+      });
+      return mappedData;
     }
+    return [];
   }, [data]);
 
-    const options = {
-      title: title,
-      hAxis: { title: yAxisTitle },
-      vAxis: { title: xAxisTitle },
-      curveType: "function",
-      backgroundColor: '#faf9f6',
-    };
+  const options = {
+    title: title,
+    hAxis: { title: yAxisTitle },
+    vAxis: { title: xAxisTitle },
+    curveType: "function",
+    backgroundColor: "#faf9f6",
+  };
 
   return (
     <div className="bg-primary">
-      <Chart 
-      chartType={"LineChart"}
-      data={chartData}
-      options={options}
-      legendToggle={false}
-      className="bg-primary"
+      <Chart
+        chartType={"LineChart"}
+        data={chartData}
+        options={options}
+        legendToggle={false}
+        className="bg-primary"
       />
     </div>
   );
-}
+});
+
+export default SolutionChart;

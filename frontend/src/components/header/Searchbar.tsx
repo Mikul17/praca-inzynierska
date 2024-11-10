@@ -1,4 +1,5 @@
 "use client";
+import { Solution } from "@/common/types";
 import { useTaskContext } from "@/context/TaskContext";
 import Gap from "@/layout/Gap";
 import { Button, Input } from "@nextui-org/react";
@@ -6,8 +7,7 @@ import { useState } from "react";
 
 export default function Searchbar() {
   const [displayOrder, setDisplayOrder] = useState<Array<number>>([]);
-  const { setOrder, tasks } = useTaskContext();
-
+  const { createSolution, calculateCmax } = useTaskContext();
   return (
     <div
       className="flex justify-center items-center bg-secondary shadow-outer-shadow"
@@ -29,7 +29,7 @@ export default function Searchbar() {
       <Button
         className="shadow-outer-shadow bg-secondary hover:bg-primary"
         size="lg"
-        onClick={() => setOrder(displayOrder)}
+        onClick={() => createSolution(displayOrder)}
         isDisabled={ displayOrder.length === 0 || displayOrder.some((x) => isNaN(x)) }
       >
         Display
