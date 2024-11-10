@@ -23,7 +23,7 @@ const useWebSocket = () => {
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [sessionId, setSessionId] = useState<string>('');
-  const { updateSimulatedAnnealingSolution } = useTaskContext();
+  const { updateSimulatedAnnealingSolution, setIsDataFetchingCompleted } = useTaskContext();
   const { currentAlgorithm } = useAlgorithm();
 
 
@@ -31,17 +31,17 @@ const useWebSocket = () => {
     if (clientRef.current) {
       clientRef.current.deactivate();
       setIsConnected(false);
+
     }
   }, []);
 
   const onMessage = (message) => {
     try {
       if (message.body === "FINISHED") {
-        console.log("Received FINISHED message, disconnecting...");
         disconnect();
+        setIsDataFetchingCompleted(true);
         return;
       }
-      console.log("Received message:", JSON.parse(message.body));
       mapToSolution(message);
     } catch (error) {
       console.error('Error parsing message:', error);

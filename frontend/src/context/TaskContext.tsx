@@ -7,6 +7,7 @@ import React, {
   useState,
   useCallback,
   useRef,
+  useEffect,
 } from "react";
 
 interface TaskContextType {
@@ -17,6 +18,8 @@ interface TaskContextType {
   recentlyChangedTasks: Set<number>;
   currentSolution: Solution | null;
   bestSolution: Solution | null;
+  isDataFetchingCompleted: boolean;
+  setIsDataFetchingCompleted: (isCompleted: boolean) => void;
   createSolution: (order: Array<number>) => void;
   calculateCmax: (order: Array<number>) => number;
   updateSolution: (solution: Solution) => void;
@@ -65,6 +68,7 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
   const [recentlyChangedTasks, setRecentlyChangedTasks] = useState<Set<number>>(
     new Set()
   );
+  const [isDataFetchingCompleted, setIsDataFetchingCompleted] = useState<boolean>(false);
   //Simulated Annealing
   const [temperatures, setTemperatures] = useState<Array<number>>([]);
   const [probabilities, setProbabilities] = useState<Array<number>>([]);
@@ -102,7 +106,7 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
   const validateOrder = useCallback(
     (order: Array<number>) => {
       const taskIds = tasks.map((task) => task.id);
-  
+      console.log(`Order length: ${order.length}, Tasks length: ${tasks.length}`);
       if (order.length > tasks.length) {
         toast.error("Order cannot be longer than the number of tasks");
         return false;
@@ -171,7 +175,6 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
     tasks.forEach((task) => {
       task.recentlyChanged = false;
     });
-    console.log("Resetting recently changed tasks");
   };
 
   const setSolutionForAnimation = useCallback(
@@ -208,14 +211,10 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
   );
 
   const updateSolution = useCallback((incomingSolution: Solution) => {
-    if(!validateOrder(incomingSolution.order)){
-      return;
-    }
     if(incomingSolution.cmax < bestSolution.cmax){
       setBestSolution(incomingSolution);
     }
     setCurrentSolution(incomingSolution);
-    console.log("Updating solution:", incomingSolution);
   }, []);
 
 
@@ -244,6 +243,8 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
     recentlyChangedTasks,
     currentSolution,
     bestSolution,
+    isDataFetchingCompleted,
+    setIsDataFetchingCompleted,
     updateSolution,
     createSolution,
     updateTasks,

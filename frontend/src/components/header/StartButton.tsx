@@ -8,17 +8,22 @@ import { useTaskContext } from "@/context/TaskContext";
 import { useAlgorithm } from "@/context/AlgorithmContext";
 import { startScheduler } from "@/common/api";
 import useWebSocket from "@/hooks/useWebSocket";
+import toast from "react-hot-toast";
 
 export default function StartButton() {
   const { isFileLoaded } = useFile();
   const { currentAlgorithm } = useAlgorithm();
-  const { solutions, bestSolution, tasks, setSolutionForAnimation, updateSolution, resetRecentlyChangedTasks } = useTaskContext();
+  const {
+    solutions,
+    tasks,
+    setSolutionForAnimation,
+    isDataFetchingCompleted,
+    updateSolution,
+    bestSolution,
+  } = useTaskContext();
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
-  const {
-    setSessionId,
-    connect
-  } = useWebSocket();
+  const { setSessionId, connect } = useWebSocket();
 
   const canAdvanceFrame = useCallback(
     (nextFrame) => {
@@ -26,42 +31,33 @@ export default function StartButton() {
     },
     [solutions]
   );
-  
 
   const onFrameChange = useCallback(
     (frame: number) => {
       if (solutions[frame]) {
         setSolutionForAnimation(solutions[frame]);
-        console.log("Frame changed to:", frame);
-      } 
+      }
     },
     [solutions, setSolutionForAnimation]
   );
 
-  const { play, currentFrame, isPlaying, } = useAnimationEffect({
+  const { play, currentFrame, isPlaying, hasAnimationEnded } = useAnimationEffect({
     initialSpeed: 5.0,
     onFrameChange,
     canAdvanceFrame,
+    isDataFetchingCompleted,
     onAnimationStart: () => console.log("Animation started"),
-    onAnimationEnd: () => {
-      setTimeout(() => {
-        resetRecentlyChangedTasks();
-        updateSolution(bestSolution);
-      }, 0);
-    },
+    onAnimationEnd: () => setTimeout(() => {
+      updateSolution(bestSolution);
+      toast.success("Displaying best solution");
+    }, 1000) 
   });
 
   useEffect(() => {
-    if (!isPlaying && solutions[currentFrame + 1]) {
+    if (!isPlaying && !hasAnimationEnded && solutions[currentFrame + 1]) {
       play();
     }
-  }, [solutions, isPlaying, play, currentFrame]);
-
-  useEffect(() => {
-    if (isPlaying) {
-      onFrameChange(currentFrame);
-    }
-  }, [currentFrame, onFrameChange, isPlaying]);
+  }, [solutions, isPlaying, play, currentFrame, hasAnimationEnded]);
 
   const newHandleClick = async () => {
     try {
@@ -71,16 +67,18 @@ export default function StartButton() {
         connect(response);
       }
     } catch (error) {
-      console.error('Failed to start scheduler:', error);
+      console.error("Failed to start scheduler:", error);
     }
   };
 
   return (
     <Button
       startContent={
-        isFileLoaded ? 
-        <Icon name="play" size={20} color="currentColor" /> : 
-        <Icon name="file" size={20} color="currentColor" />
+        isFileLoaded ? (
+          <Icon name="play" size={20} color="currentColor" />
+        ) : (
+          <Icon name="file" size={20} color="currentColor" />
+        )
       }
       className="shadow-outer-shadow bg-secondary hover:bg-primary"
       size="lg"

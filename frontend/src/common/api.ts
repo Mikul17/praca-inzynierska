@@ -9,7 +9,7 @@ const algorithmParameters: Record<AlgorithmTypeKeys, any> = {
     SimulatedAnnealing: {
         initialTemperature: 1000.2,
         coolingRate: 0.975,
-        maxIterations: 50,
+        maxIterations: 150,
     },
     TabuSearch: {
         tabuListSize: 2,
