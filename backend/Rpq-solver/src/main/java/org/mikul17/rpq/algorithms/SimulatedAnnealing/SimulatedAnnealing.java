@@ -54,13 +54,13 @@ public class SimulatedAnnealing implements Algorithm<SimulatedAnnealingParameter
             }
             batchedSolution.addTemperature(currentTemperature);
 
-            if(i % 100 == 0) {
+            if(i % 100 == 99 || i == parameters.maxIterations - 1) {
                 bestSolution.setBestCmax(bestCmax);
                 bestSolution.setBestOrder(bestPermutation != null ? bestPermutation.permutation() : null);
                 batchedSolution.setBestSolution(bestSolution);
                 solutionConsumer.accept(batchedSolution);
                 batchedSolution = new SimulatedAnnealingaBatchedSolution();
-//                Thread.sleep(4000);
+                Thread.sleep(1000);
             }
 
             if(parameters.resetTemperatureFlag) {

@@ -23,6 +23,9 @@ public class WebSocketController {
 
     @MessageMapping("/scheduler/ready")
     public void clientReady (@Payload String sessionId) {
+        if (sessionId == null || sessionId.isEmpty()) {
+            throw new IllegalArgumentException("Session ID must not be empty");
+        }
         algorithmService.clientReady(sessionId);
     }
 

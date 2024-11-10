@@ -40,6 +40,7 @@ public class TabuSearch implements Algorithm<TabuSearchParameters, TabuSearchBat
         int bestCmax = Integer.MAX_VALUE;
         Permutation bestPermutation = null;
         List<TabuMove> tabuList = new ArrayList<>(parameters.tabuListSize);
+        List<Permutation> solutions = new ArrayList<>();
 
         /* main algorithm loop */
         for (int i = 0; i < parameters.maxIterations; i++) {
@@ -52,14 +53,20 @@ public class TabuSearch implements Algorithm<TabuSearchParameters, TabuSearchBat
                 bestCmax = currentlyBestCmax;
                 bestPermutation = Permutation.fromTasks(bestCmax, copy);
             }
+            solutions.add(Permutation.fromTasks(currentlyBestCmax, copy));
 
-            bestSolution.setBestCmax(bestCmax);
-            bestSolution.setBestOrder(bestPermutation != null ? bestPermutation.permutation() : null);
-            batchedSolution.setBestSolution(bestSolution);
-            batchedSolution.updateTabuList(tabuList);
-            solutionConsumer.accept(batchedSolution);
-            batchedSolution = new TabuSearchBatchedSolution();
-//            Thread.sleep(4000);
+            if(i % 100 == 99 || i == parameters.maxIterations - 1) {
+                bestSolution.setBestCmax(bestCmax);
+                bestSolution.setBestOrder(bestPermutation != null ? bestPermutation.permutation() : null);
+                batchedSolution.setBestSolution(bestSolution);
+                batchedSolution.updateTabuList(tabuList);
+                batchedSolution.setPermutations(solutions);
+                solutionConsumer.accept(batchedSolution);
+                solutions = new ArrayList<>();
+                batchedSolution = new TabuSearchBatchedSolution();
+                //            Thread.sleep(4000);
+            }
+
 
             if(parameters.clearTabuListFlag) {
                 tabuList.clear();
