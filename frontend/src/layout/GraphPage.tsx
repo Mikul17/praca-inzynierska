@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { memo, useEffect, useMemo } from "react";
 import { useTaskContext } from "@/context/TaskContext";
 import SolutionChart from "@/components/content/SolutionChart";
 import GanttChartSection from "./Gantt/GanttChartSection";
@@ -10,18 +10,42 @@ interface LayoutProps {
   readonly height: number;
 }
 
-export default function GraphPage({ height }: LayoutProps) {
-  const { cmaxHistory } = useTaskContext();
+const GraphPage = memo(({ height }: LayoutProps) => {
+  const { solutions, temperatures, probabilities } = useTaskContext();
   const { currentAlgorithm } = useAlgorithm();
 
-  const charts = []
-
-  const generateCharts = () => {
+  const generateCharts = useMemo(() => {
+    const charts = [];
+    const cmaxHistory = solutions.map((solution) => solution.cmax);
     switch (currentAlgorithm) {
       case "SimulatedAnnealing":
-        charts.push(<SolutionChart data={cmaxHistory} title={"Cmax"} xAxisTitle={"cmax"} yAxisTitle={"iteration"} />);
-        charts.push(<SolutionChart data={cmaxHistory} title={"Temperature"} xAxisTitle={"Temperature"} yAxisTitle={"iteration"} />);
-        charts.push(<SolutionChart data={cmaxHistory} title={"Probability"} xAxisTitle={"Acceptance %"} yAxisTitle={"iteration"} />);
+        charts.push(
+          <SolutionChart
+            data={cmaxHistory}
+            title={"Cmax"}
+            xAxisTitle={"Iteration"}
+            yAxisTitle={"Cmax"}
+            key="cmax"
+          />
+        );
+        charts.push(
+          <SolutionChart
+            data={temperatures}
+            title={"Temperature"}
+            xAxisTitle={"Iteration"}
+            yAxisTitle={"Temperature"}
+            key="temperature"
+          />
+        );
+        charts.push(
+          <SolutionChart
+            data={probabilities}
+            title={"Probability"}
+            xAxisTitle={"Iteration"}
+            yAxisTitle={"Acceptance %"}
+            key="probability"
+          />
+        );
         return charts;
       case "TabuSearch":
         charts.push(<SolutionChart data={cmaxHistory} title={"Cmax"} xAxisTitle={"cmax"} yAxisTitle={"iteration"} />);
@@ -35,15 +59,17 @@ export default function GraphPage({ height }: LayoutProps) {
         default:
         return charts;
   }
-}
+}, [currentAlgorithm, solutions, temperatures, probabilities]);
 
   return (
     <div style={{ height: height}} className="flex w-full">
       <GanttChartSection />
       <Gap size={32} orientation="vertical"/>
-      <ChartCard height={height - 32 - 100}>
-        {generateCharts()}
-       </ChartCard>
+      {/* <ChartCard height={height - 32 - 100}>
+        {generateCharts}
+       </ChartCard> */}
     </div>
   );
-}
+});
+
+export default GraphPage;

@@ -1,5 +1,5 @@
 "use client";
-import { Task, TaskRequest } from "@/common/types";
+import { Solution, TabuMove, Task } from "@/common/types";
 import toast from "react-hot-toast";
 import React, {
   createContext,
@@ -7,30 +7,38 @@ import React, {
   useState,
   useCallback,
   useRef,
+  useEffect,
 } from "react";
 
 interface TaskContextType {
-  bestCmax: number;
-  currentCmax: number;
-  currentOrder: number[];
-  previousCmax: number;
-  previousBestCmax: number;
-  bestOrder: number[];
-  allOrders: number[][];
-  tasks: Task[];
-  cmaxHistory: number[];
+  tasks: Array<Task>;
+  solutions: Array<Solution>;
+  temperatures: Array<number>;
+  probabilities: Array<number>;
   recentlyChangedTasks: Set<number>;
-  updateTasks: (tasks: Task[]) => void;
-  getTasksFromOrder: (order: number[]) => Task[];
-  getTasksFromCurrentOrder: () => Task[];
-  setOrder: (order: number[]) => void;
-  setOrderForAnimation: (order: number[]) => void;
-  validateOrder: (order: number[]) => boolean;
-  updateOrders: (orders: number[][]) => void;
-  resetHistory: () => void;
+  currentSolution: Solution | null;
+  bestSolution: Solution | null;
+  isDataFetchingCompleted: boolean;
+  setIsDataFetchingCompleted: (isCompleted: boolean) => void;
+  createSolution: (order: Array<number>) => void;
+  calculateCmax: (order: Array<number>) => number;
+  updateSolution: (solution: Solution) => void;
+  updateTasks: (tasks: Array<Task>) => void;
+  getTasksFromOrder: (order:Array<number>) => Array<Task>;
+  getTasksFromCurrentOrder: () => Array<Task>;
+  updateSimulatedAnnealingSolution: (
+    solutions: Array<Solution>,
+    temperatures: Array<number>,
+    propabilities: Array<number>
+  ) => void;
+  setSolutionForAnimation: (solution: Solution) => void;
+  validateOrder: (order: Array<number>) => boolean;
+  resetRecentlyChangedTasks: () => void;
+  displayTemperatures: Array<number>;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
+const MAX_DATA_POINTS = 100;
 
 export const useTaskContext = () => {
   const context = useContext(TaskContext);
@@ -45,20 +53,33 @@ export const useTaskContext = () => {
 export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
   children,
 }) => {
-  const [bestCmax, setBestCmax] = useState<number>(Infinity);
-  const [currentCmax, setCurrentCmax] = useState<number>(Infinity);
-  const [cmaxHistory, setCmaxHistory] = useState<number[]>([]);
-  const [currentOrder, setCurrentOrder] = useState<number[]>([]);
-  const [previousCmax, setPreviousCmax] = useState<number>(Infinity);
-  const [previousBestCmax, setPreviousBestCmax] = useState<number>(Infinity);
-  const [bestOrder, setBestOrder] = useState<number[]>([]);
-  const [allOrders, setAllOrders] = useState<number[][]>([]);
-  const [tasks, setTasks] = useState<Task[]>([]);
+
+  const [currentSolution, setCurrentSolution] = useState<Solution>({
+    cmax: Infinity,
+    order: [],
+  });
+
+  const [bestSolution, setBestSolution] = useState<Solution>({
+    cmax: Infinity,
+    order: [],
+  });
+  const [solutions, setSolutions] = useState<Solution[]>([]);
+  const [tasks, setTasks] = useState<Array<Task>>([]);
   const [recentlyChangedTasks, setRecentlyChangedTasks] = useState<Set<number>>(
     new Set()
   );
+  const [isDataFetchingCompleted, setIsDataFetchingCompleted] = useState<boolean>(false);
+  //Simulated Annealing
+  const [temperatures, setTemperatures] = useState<Array<number>>([]);
+  const [probabilities, setProbabilities] = useState<Array<number>>([]);
+  const [displayTemperatures, setDisplayTemperatures] = useState<Array<number>>([]);
+  //Tabu Search
+  const [tabuList, setTabuList] = useState<TabuMove[]>([]);
+  //Schrage Algorithm
+  const [readyQueue, setReadyQueue] = useState<Array<number>>([]);
+  const [notReadyQueue, setNotReadyQueue] = useState<Array<number>>([]);
 
-  const calculateCmax = (order: number[]): number => {
+  const calculateCmax = (order: Array<number>): number => {
     let cmax = 0;
     let time = 0;
 
@@ -70,35 +91,33 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
       }
     });
 
-    if(cmax === 0) {
+    if (cmax === 0) {
       return Infinity;
     }
 
     return cmax;
   };
 
-  const updateOrders = useCallback((orders: number[][]) => {
-    setAllOrders((prevOrders) => {
-      if (JSON.stringify(prevOrders) !== JSON.stringify(orders)) {
-        return orders;
-      }
-      return prevOrders;
-    });
-  }, []);
 
-  const updateTasks = useCallback((updatedTasks: Task[]) => {
+  const updateTasks = useCallback((updatedTasks: Array<Task>) => {
     setTasks(updatedTasks);
   }, []);
 
   const validateOrder = useCallback(
-    (order: number[]) => {
+    (order: Array<number>) => {
       const taskIds = tasks.map((task) => task.id);
-
+      console.log(`Order length: ${order.length}, Tasks length: ${tasks.length}`);
       if (order.length > tasks.length) {
         toast.error("Order cannot be longer than the number of tasks");
         return false;
       }
 
+      const duplicates = order.filter((item, index) => order.indexOf(item) !== index);
+      if(duplicates.length > 0){
+        toast.error("Order contains duplicates: " + duplicates.join(", "));
+        return false;
+      }
+  
       const invalidElements = order.filter((item) => !taskIds.includes(item));
       if (invalidElements.length > 0) {
         toast.error(
@@ -106,17 +125,17 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
         );
         return false;
       }
-
+  
       return true;
     },
     [tasks]
   );
 
-  const getTasksFromCurrentOrder = (): Task[] => {
-    return getTasksFromOrder(currentOrder);
+  const getTasksFromCurrentOrder = (): Array<Task> => {
+    return getTasksFromOrder(currentSolution?.order ?? []);
   };
 
-  const getTasksFromOrder = (order: number[]): Task[] => {
+  const getTasksFromOrder = (order: Array<number>): Array<Task> => {
     if (order === undefined || order.length === 0) {
       return [];
     }
@@ -129,9 +148,9 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
     });
   };
 
-  const prevOrderRef = useRef<number[]>([]);
+  const prevOrderRef = useRef<Array<number>>([]);
 
-  const updateRecentlyChanged = (currOrder: number[]) => {
+  const updateRecentlyChanged = (currOrder: Array<number>) => {
     const prevOrder = prevOrderRef.current;
     const changedTasks = new Set<number>();
 
@@ -151,26 +170,6 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
     prevOrderRef.current = [...currOrder];
   };
 
-  const updateCmax = useCallback(
-    (order: number[], isAnimation: boolean) => {
-      const cmax = calculateCmax(order);
-      setPreviousCmax(currentCmax);
-      setCurrentCmax(cmax);
-      if (cmax < bestCmax) {
-        setPreviousBestCmax(bestCmax);
-        setBestCmax(cmax);
-        setBestOrder(order);
-      }
-
-      if (isAnimation) {
-        setCmaxHistory((prevHistory) => {
-          return [...prevHistory, cmax];
-        });
-      }
-    },
-    [calculateCmax]
-  );
-
   const resetRecentlyChangedTasks = () => {
     recentlyChangedTasks.clear();
     tasks.forEach((task) => {
@@ -178,51 +177,83 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
     });
   };
 
-  const setOrder = useCallback(
-    (order: number[]) => {
-      if(!validateOrder(order)) {
+  const setSolutionForAnimation = useCallback(
+    (solution: Solution) => {
+      if (solution) {
+        if (solution.cmax < bestSolution.cmax) {
+          setBestSolution(solution);
+        }
+        setCurrentSolution(solution);
+        updateRecentlyChanged(solution.order);
+      } else {
+        console.warn('setSolutionForAnimation called with undefined solution');
+      }
+    },
+    [bestSolution, setBestSolution, updateRecentlyChanged]
+  );
+  const updateAllSolutions = useCallback(
+    (incomingSolutions: Array<Solution>) => {
+      setSolutions((prevSolutions) => {
+        return [...prevSolutions, ...incomingSolutions]
+    });
+  },[]
+  );
+  
+  const createSolution = useCallback(
+    (order: Array<number>) => {
+      if (!validateOrder(order)) {
         return;
       }
-      resetRecentlyChangedTasks();
-      setCurrentOrder(order);
-      updateCmax(order, false);
+      const newCmax = calculateCmax(order);
+      setCurrentSolution({ order, cmax: newCmax });
     },
-    [currentOrder]
+    [calculateCmax]
   );
 
-  const setOrderForAnimation = useCallback(
-    (order: number[]) => {
-      setCurrentOrder(order);
-      updateRecentlyChanged(order);
-      updateCmax(order, true);
-    },
-    [updateRecentlyChanged]
-  );
-
-  const resetHistory = useCallback(() => {
-    setCmaxHistory([]);
-    setBestCmax(Infinity);
+  const updateSolution = useCallback((incomingSolution: Solution) => {
+    if(incomingSolution.cmax < bestSolution.cmax){
+      setBestSolution(incomingSolution);
+    }
+    setCurrentSolution(incomingSolution);
   }, []);
 
+
+  const updateSimulatedAnnealingSolution = useCallback(
+    (incomingSolutions, incomingTemperatures, incomingProbabilities) => {
+      updateAllSolutions(incomingSolutions);
+      setTemperatures((prev) => {
+        const newTemperatures = [...prev, ...incomingTemperatures];
+        return newTemperatures.slice(-MAX_DATA_POINTS);
+      });
+      setProbabilities((prev) => {
+        const newProbabilities = [...prev, ...incomingProbabilities];
+        return newProbabilities.slice(-MAX_DATA_POINTS);
+      });
+    },
+    []
+  );
+
   const value = {
-    bestCmax,
-    currentCmax,
-    cmaxHistory,
-    currentOrder,
-    previousCmax,
-    previousBestCmax,
-    bestOrder,
-    allOrders,
+    calculateCmax,
     tasks,
+    temperatures,
+    displayTemperatures,
+    probabilities,
+    solutions,
     recentlyChangedTasks,
+    currentSolution,
+    bestSolution,
+    isDataFetchingCompleted,
+    setIsDataFetchingCompleted,
+    updateSolution,
+    createSolution,
     updateTasks,
     getTasksFromOrder,
     getTasksFromCurrentOrder,
-    setOrder,
-    setOrderForAnimation,
+    setSolutionForAnimation,
     validateOrder,
-    updateOrders,
-    resetHistory,
+    updateSimulatedAnnealingSolution,
+    resetRecentlyChangedTasks,
   };
 
   return <TaskContext.Provider value={value}>{children}</TaskContext.Provider>;

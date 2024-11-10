@@ -22,6 +22,13 @@ export const AlgorithmDisplayNames: Record<AlgorithmTypeKeys, string> = {
   CarlierAlgorithm: "Carlier Algorithm",
 };
 
+export const AlgorithmApiNames: Record<AlgorithmTypeKeys, string> = {
+  SimulatedAnnealing: "SIMULATED_ANNEALING",
+  TabuSearch: "TABU_SEARCH",
+  SchrageAlgorithm: "SCHRAGE",
+  CarlierAlgorithm: "CARLIER",
+};
+
 interface AlgorithmContextType {
   currentAlgorithm: AlgorithmTypeKeys;
   setCurrentAlgorithm: React.Dispatch<React.SetStateAction<AlgorithmTypeKeys>>;

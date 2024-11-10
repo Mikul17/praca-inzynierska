@@ -1,12 +1,8 @@
 "use client";
 import {  Tab, Tabs } from "@nextui-org/react";
-import dynamic from "next/dynamic";
-import { useState } from "react";
-import { useTaskContext } from "@/context/TaskContext";
-import { useFile } from "@/context/FileContext";
 import GraphPage from "./GraphPage";
-import GanttSectionHeader from "./Gantt/GraphPageHeader";
 import DataSection from "./Data/DataSection";
+import useWebSocket from "@/hooks/useWebSocket";
 
 interface PageContentProps {
   height: number;
