@@ -13,6 +13,7 @@ const algorithmParameters: Record<AlgorithmTypeKeys, any> = {
     },
     TabuSearch: {
         tabuListSize: 2,
+        isTenureDynamic: false,
         maxIterations: 200,
     },
     SchrageAlgorithm: {

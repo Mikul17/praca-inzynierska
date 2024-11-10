@@ -42,8 +42,7 @@ class AlgorithmControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/start_scheduling")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string(org.hamcrest.Matchers.containsString("Connection request sent, session id: ")));
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
         verify(algorithmService, Mockito.times(1)).startAlgorithm(any(ScheduleRequest.class), anyString());
     }

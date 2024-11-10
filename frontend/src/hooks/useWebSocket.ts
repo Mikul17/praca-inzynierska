@@ -2,7 +2,7 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import { Client, Frame, IMessage } from "@stomp/stompjs";
 import { useTaskContext } from "@/context/TaskContext";
 import { useAlgorithm } from "@/context/AlgorithmContext";
-import { TabuSearchResponse, SchrageResponse, CarlierResponse, Solution } from "@/common/types";
+import { TabuSearchResponse, SchrageResponse, CarlierResponse, Solution, TabuMove } from "@/common/types";
 
 export const BROKER_URL = 'ws://localhost:8080/api/rpq/websocket';
 export const SOLUTION_TOPIC = '/scheduler/solution/';
@@ -23,7 +23,7 @@ const useWebSocket = () => {
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [sessionId, setSessionId] = useState<string>('');
-  const { updateSimulatedAnnealingSolution, setIsDataFetchingCompleted } = useTaskContext();
+  const { updateSimulatedAnnealingSolution, updateTabuSearchSolution, setIsDataFetchingCompleted } = useTaskContext();
   const { currentAlgorithm } = useAlgorithm();
 
 
@@ -145,18 +145,32 @@ const useWebSocket = () => {
       switch (currentAlgorithm) {
         case 'SimulatedAnnealing':
           data = JSON.parse(message.body);
-          const solutions: Array<Solution> = data.permutations.map((solution) => {
+          const probabilities: Array<number> = data.probabilities;
+          const temperatures: Array<number> = data.temperatures;
+          const saSolutions: Array<Solution> = data.permutations.map((solution) => {
+            return {
+              cmax: solution.cmax,
+              order: solution.permutation,
+            } as Solution;
+          }); 
+          updateSimulatedAnnealingSolution(saSolutions, temperatures, probabilities);
+          break;
+        case 'TabuSearch':
+          data = JSON.parse(message.body) as TabuSearchResponse;
+          const tabuList: Array<TabuMove> = data.tabuList.map((move) => {
+            return {
+              firstTaskId: move.firstTaskId,
+              secondTaskId: move.secondTaskId,
+              moveCmax: move.moveCmax,
+            } as TabuMove;
+          });
+          const tabuSolutions: Array<Solution> = data.permutations.map((solution) => {
             return {
               cmax: solution.cmax,
               order: solution.permutation,
             } as Solution;
           });
-          const probabilities: Array<number> = data.probabilities;
-          const temperatures: Array<number> = data.temperatures;
-          updateSimulatedAnnealingSolution(solutions, temperatures, probabilities);
-          break;
-        case 'TabuSearch':
-          data = JSON.parse(message.body) as TabuSearchResponse;
+          updateTabuSearchSolution(tabuSolutions, tabuList);
           break;
         case 'SchrageAlgorithm':
           data = JSON.parse(message.body) as SchrageResponse;

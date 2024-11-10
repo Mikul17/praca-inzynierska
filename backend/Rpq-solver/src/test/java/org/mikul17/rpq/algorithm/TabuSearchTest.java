@@ -27,6 +27,7 @@ public class TabuSearchTest {
                 .builder()
                 .maxIterations(5)
                 .tabuListSize(2)
+                .isTenureDynamic(false)
                 .tasks(testTasks)
                 .build();
         Permutation result = ts.solve(p, solution -> {});
@@ -34,4 +35,20 @@ public class TabuSearchTest {
         Assertions.assertThat(result.cmax()).isEqualTo(11);
         Assertions.assertThat(result.permutation()).isEqualTo(List.of(3,2,1));
     }
+
+    @Test
+    void firstTestCaseShouldReturnCorrectResultDynamicTenure () {
+        TabuSearchParameters p = TabuSearchParameters
+                .builder()
+                .maxIterations(5)
+                .isTenureDynamic(true)
+                .initialTenure(3)
+                .tasks(testTasks)
+                .build();
+        Permutation result = ts.solve(p, solution -> {});
+
+        Assertions.assertThat(result.cmax()).isEqualTo(11);
+        Assertions.assertThat(result.permutation()).isEqualTo(List.of(3,2,1));
+    }
+
 }

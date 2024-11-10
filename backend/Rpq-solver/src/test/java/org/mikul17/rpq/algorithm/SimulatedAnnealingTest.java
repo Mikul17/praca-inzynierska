@@ -27,7 +27,7 @@ public class SimulatedAnnealingTest {
                 .builder()
                 .initialTemperature(100.0)
                 .coolingRate(0.99995)
-                .maxIterations(5)
+                .maxIterations(50)
                 .tasks(testTasks)
                 .build();
         Permutation result = sa.solve(p, solution -> {});

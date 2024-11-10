@@ -8,6 +8,7 @@ import org.mikul17.rpq.algorithms.common.Task;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -31,7 +32,7 @@ public class TabuSearch implements Algorithm<TabuSearchParameters, TabuSearchBat
      */
     @SneakyThrows
     @Override
-    public Permutation solve (TabuSearchParameters parameters, Consumer<TabuSearchBatchedSolution> solutionConsumer) {
+    public Permutation solve(TabuSearchParameters parameters, Consumer<TabuSearchBatchedSolution> solutionConsumer) {
         TabuSearchBatchedSolution batchedSolution = new TabuSearchBatchedSolution();
         Solution bestSolution = new Solution();
 
@@ -39,23 +40,42 @@ public class TabuSearch implements Algorithm<TabuSearchParameters, TabuSearchBat
         List<Task> copy = new ArrayList<>(parameters.getTasks());
         int bestCmax = Integer.MAX_VALUE;
         Permutation bestPermutation = null;
-        List<TabuMove> tabuList = new ArrayList<>(parameters.tabuListSize);
+
+        List<TabuMove> tabuList = new ArrayList<>();
         List<Permutation> solutions = new ArrayList<>();
 
-        /* main algorithm loop */
+        /* Main algorithm loop */
         for (int i = 0; i < parameters.maxIterations; i++) {
-            TabuMove result = findBestTabu(copy, tabuList);
-            int currentlyBestCmax = result.moveCmax();
-            Collections.swap(copy, result.firstTask(), result.secondTask());
-            addMoveToTabuList(result, tabuList, parameters.tabuListSize);
+            // Find the best move, considering tabu status and aspiration criteria
+            TabuMove result = findBestTabu(copy, tabuList, parameters, bestCmax);
+            int currentlyBestCmax = result.getMoveCmax();
 
+            // Apply the move
+            Collections.swap(copy, result.getFirstTask(), result.getSecondTask());
+
+            // Add move to tabu list
+            addMoveToTabuList(result, tabuList, parameters);
+
+            // Update the best solution if necessary
             if (currentlyBestCmax < bestCmax) {
                 bestCmax = currentlyBestCmax;
                 bestPermutation = Permutation.fromTasks(bestCmax, copy);
             }
             solutions.add(Permutation.fromTasks(currentlyBestCmax, copy));
 
-            if(i % 100 == 99 || i == parameters.maxIterations - 1) {
+            // Update or manage the tabu list based on the version
+            if (parameters.isTenureDynamic) {
+                // Reduce tenure of moves in the tabu list
+                reduceTenure(tabuList);
+            } else {
+                // Maintain fixed-size tabu list
+                if (tabuList.size() > parameters.tabuListSize) {
+                    tabuList.removeFirst();
+                }
+            }
+
+            // Batch processing and solution consumption
+            if (i % 100 == 99 || i == parameters.maxIterations - 1) {
                 bestSolution.setBestCmax(bestCmax);
                 bestSolution.setBestOrder(bestPermutation != null ? bestPermutation.permutation() : null);
                 batchedSolution.setBestSolution(bestSolution);
@@ -64,79 +84,67 @@ public class TabuSearch implements Algorithm<TabuSearchParameters, TabuSearchBat
                 solutionConsumer.accept(batchedSolution);
                 solutions = new ArrayList<>();
                 batchedSolution = new TabuSearchBatchedSolution();
-                //            Thread.sleep(4000);
+                Thread.sleep(4000);
             }
 
-
-            if(parameters.clearTabuListFlag) {
+            if (parameters.clearTabuListFlag) {
                 tabuList.clear();
                 parameters.clearTabuListFlag = false;
             }
 
             parameters.applyPendingChanges();
-            if(parameters.resizeTabuList) {
-                tabuList = resizeTabuList(tabuList, parameters.tabuListSize);
-                parameters.resizeTabuList = false;
-            }
         }
 
         return bestPermutation;
     }
 
-    /**
-     * Adds a move to the tabu list. If the tabu list is full, it removes the first element.
-     *
-     * @param result   - move to be added to the tabu list
-     * @param tabuList - list of forbidden moves
-     * @param maxSize  - maximum size of the tabu list
-     */
-    private void addMoveToTabuList (TabuMove result, List<TabuMove> tabuList, int maxSize) {
-        if (tabuList.size() >= maxSize) {
-            tabuList.removeFirst();
+
+    private void addMoveToTabuList(TabuMove result, List<TabuMove> tabuList, TabuSearchParameters parameters) {
+        if (parameters.isTenureDynamic) {
+            tabuList.add(result);
+        } else {
+            result.setTenure(-1);
+            tabuList.add(result);
         }
-        tabuList.add(result);
     }
 
-    /**
-     * Finds the best move to make. It checks all possible permutations of tasks
-     * and returns the best one.
-     *
-     * @param copy     - list of tasks to be checked
-     * @param tabuList - list of forbidden moves
-     * @return TabuMove - object containing the best move
-     * @see TabuMove
-     */
-    private TabuMove findBestTabu (List<Task> copy, List<TabuMove> tabuList) {
+    private TabuMove findBestTabu(List<Task> copy, List<TabuMove> tabuList, TabuSearchParameters parameters, int bestCmax) {
         int firstBestTask = -1;
         int secondBestTask = -1;
-        int bestCmax = Integer.MAX_VALUE;
+        int bestCmaxLocal = Integer.MAX_VALUE;
+        int initialTenure = parameters.initialTenure;
 
         for (int i = 0; i < copy.size(); i++) {
             for (int j = i + 1; j < copy.size(); j++) {
                 Collections.swap(copy, i, j);
                 int newCmax = calculateCmax(copy);
-                if (newCmax < bestCmax && !isTabu(i, j, tabuList)) {
-                    bestCmax = newCmax;
+                boolean isTabuMove = isTabu(i, j, tabuList);
+
+                if (!isTabuMove && newCmax < bestCmaxLocal) {
+
+                    bestCmaxLocal = newCmax;
                     firstBestTask = i;
                     secondBestTask = j;
+                } else if (isTabuMove && newCmax < bestCmax) {
+
+                    if (newCmax < bestCmaxLocal) {
+                        bestCmaxLocal = newCmax;
+                        firstBestTask = i;
+                        secondBestTask = j;
+                    }
                 }
                 Collections.swap(copy, i, j);
             }
         }
-        return new TabuMove(firstBestTask, secondBestTask, bestCmax);
+
+        return new TabuMove(firstBestTask, secondBestTask, bestCmaxLocal, initialTenure);
     }
 
-    /**
-     * Checks if a move is forbidden (is present in the tabu list).
-     *
-     * @param i        - index of the first task
-     * @param j        - index of the second task
-     * @param tabuList - list of forbidden moves
-     * @return boolean - true if the move is forbidden, false otherwise
-     */
-    private boolean isTabu (int i, int j, List<TabuMove> tabuList) {
+    private boolean isTabu(int i, int j, List<TabuMove> tabuList) {
         for (TabuMove move : tabuList) {
-            if (move.firstTask() == i && move.secondTask() == j) {
+            boolean match = (move.getFirstTask() == i && move.getSecondTask() == j) ||
+                    (move.getFirstTask() == j && move.getSecondTask() == i);
+            if (match) {
                 return true;
             }
         }
@@ -154,5 +162,17 @@ public class TabuSearch implements Algorithm<TabuSearchParameters, TabuSearchBat
 
         return tabuList;
     }
+
+    private void reduceTenure(List<TabuMove> tabuList) {
+        Iterator<TabuMove> iterator = tabuList.iterator();
+        while (iterator.hasNext()) {
+            TabuMove move = iterator.next();
+            move.setTenure(move.getTenure() - 1);
+            if (move.getTenure() <= 0) {
+                iterator.remove();
+            }
+        }
+    }
+
 
 }
