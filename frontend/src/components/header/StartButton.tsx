@@ -20,6 +20,7 @@ export default function StartButton() {
     isDataFetchingCompleted,
     updateSolution,
     bestSolution,
+    clearAnimationData,
   } = useTaskContext();
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
@@ -46,7 +47,7 @@ export default function StartButton() {
     onFrameChange,
     canAdvanceFrame,
     isDataFetchingCompleted,
-    onAnimationStart: () => console.log("Animation started"),
+    onAnimationStart: () => clearAnimationData(),
     onAnimationEnd: () => setTimeout(() => {
       updateSolution(bestSolution);
       toast.success("Displaying best solution");

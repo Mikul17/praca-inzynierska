@@ -31,9 +31,14 @@ interface TaskContextType {
     temperatures: Array<number>,
     propabilities: Array<number>
   ) => void;
+  updateTabuSearchSolution: (
+    solutions: Array<Solution>,
+    tabuList: Array<TabuMove>
+  ) => void;
   setSolutionForAnimation: (solution: Solution) => void;
   validateOrder: (order: Array<number>) => boolean;
   resetRecentlyChangedTasks: () => void;
+  clearAnimationData: () => void;
   displayTemperatures: Array<number>;
 }
 
@@ -233,6 +238,24 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
     []
   );
 
+  const updateTabuSearchSolution = useCallback(
+    (incomingSolutions, incomingTabuList) => {
+      updateAllSolutions(incomingSolutions);
+      setTabuList((prev) => {
+        const newTabuList = [...prev, ...incomingTabuList];
+        return newTabuList.slice(-MAX_DATA_POINTS);
+      });
+    },
+    []
+  );
+
+  const clearAnimationData = () => {
+    setSolutions([]);
+    setTemperatures([]);
+    setProbabilities([]);
+    setTabuList([]);
+  };
+
   const value = {
     calculateCmax,
     tasks,
@@ -253,7 +276,9 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
     setSolutionForAnimation,
     validateOrder,
     updateSimulatedAnnealingSolution,
+    updateTabuSearchSolution,
     resetRecentlyChangedTasks,
+    clearAnimationData,
   };
 
   return <TaskContext.Provider value={value}>{children}</TaskContext.Provider>;
