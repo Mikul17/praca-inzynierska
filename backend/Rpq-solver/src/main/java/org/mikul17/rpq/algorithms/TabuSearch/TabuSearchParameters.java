@@ -17,6 +17,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class TabuSearchParameters extends AlgorithmParameters {
     protected int maxIterations;
     protected volatile int tabuListSize;
+    protected int initialTenure;
+    protected boolean isTenureDynamic;
     protected volatile boolean clearTabuListFlag = false;
     protected volatile boolean resizeTabuList = false;
 
@@ -26,7 +28,15 @@ public class TabuSearchParameters extends AlgorithmParameters {
     @Override
     public void fromMap (Map<String, Object> map) {
         maxIterations = (int) map.get("maxIterations");
-        tabuListSize = (int) map.get("tabuListSize");
+        isTenureDynamic = (boolean) map.get("isTenureDynamic");
+        if(isTenureDynamic) {
+            initialTenure = (int) map.get("initialTenure");
+            if(initialTenure <= 1){
+                throw new IllegalArgumentException("Initial tenure must be greater than 1");
+            }
+        }else{
+            tabuListSize = (int) map.get("tabuListSize");
+        }
         if(tabuListSize >= tasks.size() - 1) {
             tabuListSize = tasks.size();
             throw new IllegalArgumentException("Tabu list size cannot be greater than number of tasks - 1");
