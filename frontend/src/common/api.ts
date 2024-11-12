@@ -8,16 +8,17 @@ export const START_ALGORITHM_URL = '/start_scheduling'
 const algorithmParameters: Record<AlgorithmTypeKeys, any> = {
     SimulatedAnnealing: {
         initialTemperature: 1000.2,
-        coolingRate: 0.975,
-        maxIterations: 150,
+        coolingRate: 0.8585,
+        maxIterations: 1500,
     },
     TabuSearch: {
-        tabuListSize: 2,
-        isTenureDynamic: false,
-        maxIterations: 200,
+        tabuListSize: 48,
+        isTenureDynamic: true,
+        initialTenure: 10,
+        maxIterations: 1000,
     },
     SchrageAlgorithm: {
-        preemption: false,
+        preemptive: false,
     },
     CarlierAlgorithm: {
     }
@@ -34,6 +35,7 @@ export const startScheduler = async (algorithm: AlgorithmTypeKeys, tasks: Task[]
         },
         body: JSON.stringify({
             algorithm: AlgorithmApiNames[algorithm],
+            timeoutDuration: 2,
             tasks: tasks,
             parameters: parameters
         })

@@ -2,7 +2,7 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import { Client, Frame, IMessage } from "@stomp/stompjs";
 import { useTaskContext } from "@/context/TaskContext";
 import { useAlgorithm } from "@/context/AlgorithmContext";
-import { TabuSearchResponse, SchrageResponse, CarlierResponse, Solution, TabuMove } from "@/common/types";
+import { Solution, TabuMove, TreeNode } from "@/common/types";
 
 export const BROKER_URL = 'ws://localhost:8080/api/rpq/websocket';
 export const SOLUTION_TOPIC = '/scheduler/solution/';
@@ -23,7 +23,7 @@ const useWebSocket = () => {
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [sessionId, setSessionId] = useState<string>('');
-  const { updateSimulatedAnnealingSolution, updateTabuSearchSolution, setIsDataFetchingCompleted } = useTaskContext();
+  const { updateSimulatedAnnealingSolution, updateTabuSearchSolution, setIsDataFetchingCompleted, updateSchrageSolution, updateCarlierSolution } = useTaskContext();
   const { currentAlgorithm } = useAlgorithm();
 
 
@@ -156,12 +156,14 @@ const useWebSocket = () => {
           updateSimulatedAnnealingSolution(saSolutions, temperatures, probabilities);
           break;
         case 'TabuSearch':
-          data = JSON.parse(message.body) as TabuSearchResponse;
-          const tabuList: Array<TabuMove> = data.tabuList.map((move) => {
+          data = JSON.parse(message.body);
+          const tabuList: Array<TabuMove> = data.tabuList.map((move, id) => {
             return {
-              firstTaskId: move.firstTaskId,
-              secondTaskId: move.secondTaskId,
+              id: id,
+              firstTaskId: move.firstTask,
+              secondTaskId: move.secondTask,
               moveCmax: move.moveCmax,
+              tenure: move.tenure,
             } as TabuMove;
           });
           const tabuSolutions: Array<Solution> = data.permutations.map((solution) => {
@@ -173,10 +175,49 @@ const useWebSocket = () => {
           updateTabuSearchSolution(tabuSolutions, tabuList);
           break;
         case 'SchrageAlgorithm':
-          data = JSON.parse(message.body) as SchrageResponse;
+          data = JSON.parse(message.body);
+          const scSolutions: Array<Solution> = data.permutations.map((solution) => {
+            return {
+              cmax: solution.cmax,
+              order: solution.permutation,
+            } as Solution;
+          }); 
+          const notReadyQueue: Array<number> = data.notReadyQueue;
+          const readyQueue: Array<number> = data.readyQueue;
+          const bestSolutionSchrage: Solution = {
+            cmax: data.bestSolution.bestCmax,
+            order: data.bestSolution.bestOrder,
+        } as Solution;
+          updateSchrageSolution(scSolutions, notReadyQueue, readyQueue, bestSolutionSchrage);
           break;
-        case 'CarlierAlgorithm':
-          data = JSON.parse(message.body) as CarlierResponse;
+          case 'CarlierAlgorithm':
+            data = JSON.parse(message.body);
+            console.log('Carlier data:', data);
+    
+            //Extract best solution
+            const bestSolutionCarlier: Solution = {
+              cmax: data.bestSolution.bestCmax,
+              order: data.bestSolution.bestOrder,
+            };
+    
+            // Upper bound
+            const ubCarlier: number = data.ub;
+    
+            // Root node of the tree
+            const rootNode: TreeNode = {
+              "@id": data.node["@id"],
+              parent: data.node.parent,
+              children: data.node.children,
+              permutation: {
+                cmax: data.node.permutation.cmax,
+                order: data.node.permutation.permutation,
+              },
+              ub: data.node.ub,
+              lb: data.node.lb,
+              pruned: data.node.pruned,
+            }
+    
+            updateCarlierSolution([], rootNode);
           break;
         default:
           throw new Error(`Algorithm ${currentAlgorithm} not supported`);

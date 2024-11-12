@@ -26,14 +26,15 @@ const GanttChart: React.FC<GanttChartProps> = () => {
   const computeSchedule = (tasks: Task[]): Task[] => {
     let currentTime = 0;
 
-    return tasks.map((task) => {
+    return tasks.map((task, index) => {
       const start = Math.max(task.r, currentTime);
       const end = start + task.p;
+      const extendedEnd = index === tasks.length - 1 ? end + task.q : end;
       currentTime = end;
       return {
         ...task,
         actualStart: start,
-        actualEnd: end,
+        actualEnd: extendedEnd ,
       };
     });
   };

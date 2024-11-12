@@ -22,6 +22,7 @@ public class Schrage implements Algorithm<SchrageParameters, SchrageBatchedSolut
         Solution solution = new Solution();
         SchrageBatchedSolution batchedSolution = new SchrageBatchedSolution();
         List<Integer> permutation = new ArrayList<>();
+        List<Permutation> solutions = new ArrayList<>();
 
         List<ModifiableTask> modifiableTasks = parameters.getTasks().stream()
                 .map(task -> new ModifiableTask(task.id(), task.r(), task.p(), task.q()))
@@ -39,6 +40,14 @@ public class Schrage implements Algorithm<SchrageParameters, SchrageBatchedSolut
             while (!notReadyQueue.isEmpty() && notReadyQueue.peek().r <= currentTime) {
                 ModifiableTask task = notReadyQueue.poll();
                 readyQueue.add(task);
+                solution.setBestCmax(cmax);
+                solution.setBestOrder(new ArrayList<>(permutation));
+                batchedSolution.setQueueFromModifiableTask(readyQueue, true);
+                batchedSolution.setQueueFromModifiableTask(notReadyQueue, false);
+                batchedSolution.setBestSolution(solution);
+                solutionConsumer.accept(batchedSolution);
+                batchedSolution = new SchrageBatchedSolution();
+                Thread.sleep(parameters.getTimeoutDuration());
 
                 if (currentTask != null && task.q > currentTask.q) {
                     currentTask.p = (currentTime - task.r);
@@ -56,17 +65,18 @@ public class Schrage implements Algorithm<SchrageParameters, SchrageBatchedSolut
                 currentTask = readyQueue.poll();
                 currentTime += currentTask.p;
                 permutation.add(currentTask.getId());
+                solutions.add(Permutation.fromId(currentTime + currentTask.q, new ArrayList<>(permutation)));
                 cmax = Math.max(cmax, currentTime + currentTask.getQ());
-
-                solution.setBestCmax(cmax);
-                solution.setBestOrder(new ArrayList<>(permutation));
-                batchedSolution.setQueueFromModifiableTask(readyQueue);
-                batchedSolution.setQueueFromModifiableTask(notReadyQueue);
-                batchedSolution.setBestSolution(solution);
-                solutionConsumer.accept(batchedSolution);
-                batchedSolution = new SchrageBatchedSolution();
-//                Thread.sleep(1000);
             }
+            solution.setBestCmax(cmax);
+            solution.setBestOrder(new ArrayList<>(permutation));
+            batchedSolution.setQueueFromModifiableTask(readyQueue, true);
+            batchedSolution.setQueueFromModifiableTask(notReadyQueue, false);
+            batchedSolution.setBestSolution(solution);
+            batchedSolution.setPermutations(solutions);
+            solutionConsumer.accept(batchedSolution);
+            batchedSolution = new SchrageBatchedSolution();
+            Thread.sleep(parameters.getTimeoutDuration());
         }
 
         return Permutation.fromId(cmax, permutation);
@@ -77,6 +87,7 @@ public class Schrage implements Algorithm<SchrageParameters, SchrageBatchedSolut
         Solution solution = new Solution();
         SchrageBatchedSolution batchedSolution = new SchrageBatchedSolution();
         List<Integer> permutation = new ArrayList<>();
+        List<Permutation> solutions = new ArrayList<>();
 
         List<Task> tasks = new ArrayList<>(parameters.getTasks());
 
@@ -90,6 +101,14 @@ public class Schrage implements Algorithm<SchrageParameters, SchrageBatchedSolut
         while (!readyQueue.isEmpty() || !notReadyQueue.isEmpty()) {
             while (!notReadyQueue.isEmpty() && notReadyQueue.peek().r() <= currentTime) {
                 readyQueue.add(notReadyQueue.poll());
+                solution.setBestCmax(cmax);
+                solution.setBestOrder(new ArrayList<>(permutation));
+                batchedSolution.setQueueFromTask(readyQueue, true);
+                batchedSolution.setQueueFromTask(notReadyQueue, false);
+                batchedSolution.setBestSolution(solution);
+                solutionConsumer.accept(batchedSolution);
+                batchedSolution = new SchrageBatchedSolution();
+                Thread.sleep(parameters.getTimeoutDuration());
             }
             if (readyQueue.isEmpty()) {
                 assert notReadyQueue.peek() != null;
@@ -98,17 +117,19 @@ public class Schrage implements Algorithm<SchrageParameters, SchrageBatchedSolut
                 Task task = readyQueue.poll();
                 currentTime += task.p();
                 permutation.add(task.id());
+                solutions.add(Permutation.fromId(currentTime + task.q(), new ArrayList<>(permutation)));
                 int taskEnd = currentTime + task.q();
                 cmax = Math.max(cmax, taskEnd);
 
                 solution.setBestCmax(cmax);
                 solution.setBestOrder(new ArrayList<>(permutation));
-                batchedSolution.setQueueFromTask(readyQueue);
-                batchedSolution.setQueueFromTask(notReadyQueue);
+                batchedSolution.setQueueFromTask(readyQueue, true);
+                batchedSolution.setQueueFromTask(notReadyQueue, false);
                 batchedSolution.setBestSolution(solution);
+                batchedSolution.setPermutations(solutions);
                 solutionConsumer.accept(batchedSolution);
                 batchedSolution = new SchrageBatchedSolution();
-//                Thread.sleep(1000);
+                Thread.sleep(parameters.getTimeoutDuration());
             }
         }
 

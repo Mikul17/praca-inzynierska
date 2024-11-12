@@ -9,9 +9,7 @@ interface FileContextType {
   fileTasks: Task[] | null;
   fileName: string | null;
   loadFile: (file: File) => Promise<void>;
-  sendFileToBackend: () => Promise<void>;
   loadSampleData: (tasks: Task[]) => void;
-  isUploading: boolean;
   generateSampleTasks: (size: number, maxR: number, maxP: number, maxQ: number) => void;
   downloadFile: (format: "csv" | "txt", orderOnly: boolean, order: number[]) => void;
   deleteLoadedFile: () => void;
@@ -23,9 +21,7 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isFileLoaded, setIsFileLoaded] = useState<boolean>(false);
   const [fileTasks, setFileTasks] = useState<Task[] | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
   const MIN_GENERATED_VALUE = 1;
-
 
 
   const saveToSessionStorage = useCallback((tasks: Task[] | null, name: string | null, loaded: boolean) => {
@@ -91,35 +87,6 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     loadSampleData(tasks)
 }
- /* TODO - modify this function and test it with backend*/
-  const sendFileToBackend = useCallback(async () => {
-    if (!isFileLoaded || !fileTasks) {
-      throw new Error('No file loaded');
-    }
-
-    setIsUploading(true);
-
-    try {
-      const csvContent = fileTasks;
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ fileName, data: csvContent }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-
-      console.log('File uploaded successfully');
-    } catch (error) {
-      console.error('Error uploading file:', error);
-    } finally {
-      setIsUploading(false);
-    }
-  }, [isFileLoaded, fileTasks, fileName]);
 
   const downloadFile = useCallback((format: "csv" | "txt", orderOnly: boolean, order: number[]) => {
     const file = convertTasksToFile(format, orderOnly, order);
@@ -156,8 +123,6 @@ export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fileTasks,
     fileName,
     loadFile,
-    sendFileToBackend,
-    isUploading,
     loadSampleData,
     generateSampleTasks,
     downloadFile,

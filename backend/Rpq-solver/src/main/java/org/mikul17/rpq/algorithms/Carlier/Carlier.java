@@ -54,13 +54,14 @@ public class Carlier implements Algorithm<CarlierParameters, CarlierBatchedSolut
         solution.setNode(currentNode);
         solution.setBestSolution(new Solution(bestPermutation.cmax(), bestPermutation.permutation()));
         stream.accept(solution);
+        Thread.sleep(1000);
 
         List<ScheduledTask> criticalPath = findCriticalPath(schedule);
         if (criticalPath.isEmpty()) {
             return;
         }
 
-        ScheduledTask taskB = criticalPath.get(criticalPath.size() - 1);
+        ScheduledTask taskB = criticalPath.getLast();
         ScheduledTask taskC = IntStream.iterate(criticalPath.size() - 1, i -> i >= 0, i -> i - 1)
                 .mapToObj(criticalPath::get)
                 .filter(task -> task.getQ() < taskB.getQ())

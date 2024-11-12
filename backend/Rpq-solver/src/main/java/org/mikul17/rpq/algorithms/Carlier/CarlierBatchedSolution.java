@@ -8,5 +8,6 @@ import org.mikul17.rpq.algorithms.common.BatchedSolution;
 @Setter
 public class CarlierBatchedSolution extends BatchedSolution {
     private int ub;
+    private int lb;
     private Carlier.SolutionNode node;
 }

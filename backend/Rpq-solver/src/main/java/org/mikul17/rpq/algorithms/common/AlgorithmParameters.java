@@ -21,6 +21,7 @@ import java.util.Map;
 @NoArgsConstructor
 public abstract class AlgorithmParameters {
     protected List<Task> tasks;
+    protected int timeoutDuration;
 
     public abstract void fromMap(Map<String, Object> map);
     public abstract void updateFromMap(Map<String, Object> map);
