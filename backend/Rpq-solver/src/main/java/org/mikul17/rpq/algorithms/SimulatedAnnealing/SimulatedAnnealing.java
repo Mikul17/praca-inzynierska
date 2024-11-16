@@ -31,12 +31,12 @@ public class SimulatedAnnealing implements Algorithm<SimulatedAnnealingParameter
             List<Task> candidate = new ArrayList<>(copy);
             swapTwoRandomElements(candidate);
             int newCmax = calculateCmax(candidate);
-
+            int diff = newCmax - previousCmax;
             double acceptanceProbability = acceptanceProbability(
-                    previousCmax,
-                    newCmax,
+                    diff,
                     currentTemperature
             );
+
 
             batchedSolution.addPermutation(candidate, newCmax);
             batchedSolution.addProbability(acceptanceProbability);
@@ -60,7 +60,7 @@ public class SimulatedAnnealing implements Algorithm<SimulatedAnnealingParameter
                 batchedSolution.setBestSolution(bestSolution);
                 solutionConsumer.accept(batchedSolution);
                 batchedSolution = new SimulatedAnnealingaBatchedSolution();
-                Thread.sleep(1000);
+                Thread.sleep(parameters.getTimeoutDuration());
             }
 
             if(parameters.resetTemperatureFlag) {
@@ -73,11 +73,11 @@ public class SimulatedAnnealing implements Algorithm<SimulatedAnnealingParameter
         return bestPermutation;
     }
 
-    private double acceptanceProbability (int best, int current, double temperature) {
-        if (current < best) {
+    private double acceptanceProbability(int diff, double temperature) {
+        if (diff < 0) {
             return 1.0;
         }
-        return Math.max(Math.exp((best - current) / temperature), 0.05);
+        return Math.max(Math.exp(-diff / temperature), 0.05);
     }
 
     private void swapTwoRandomElements (List<Task> tasks) {

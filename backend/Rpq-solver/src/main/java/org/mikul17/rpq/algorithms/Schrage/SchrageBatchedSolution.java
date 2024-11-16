@@ -14,12 +14,19 @@ public class SchrageBatchedSolution extends BatchedSolution {
     private PriorityQueue<Integer> readyQueue =new PriorityQueue<>(Comparator.reverseOrder());
     private PriorityQueue<Integer> notReadyQueue = new PriorityQueue<>();
 
-    public void setQueueFromModifiableTask (PriorityQueue<Schrage.ModifiableTask> queue) {
-        queue.forEach(task -> this.readyQueue.add(task.getId()));
+    public void setQueueFromModifiableTask (PriorityQueue<Schrage.ModifiableTask> queue, boolean ready) {
+        if(ready) {
+            queue.forEach(task -> this.readyQueue.add(task.getId()));
+        } else {
+            queue.forEach(task -> this.notReadyQueue.add(task.getId()));
+        }
     }
 
-    public void setQueueFromTask (PriorityQueue<Task> queue) {
-        queue.forEach(task -> this.notReadyQueue.add(task.id()));
+    public void setQueueFromTask (PriorityQueue<Task> queue, boolean ready) {
+        if (ready) {
+            queue.forEach(task -> this.readyQueue.add(task.id()));
+        } else {
+            queue.forEach(task -> this.notReadyQueue.add(task.id()));
+        }
     }
-
 }

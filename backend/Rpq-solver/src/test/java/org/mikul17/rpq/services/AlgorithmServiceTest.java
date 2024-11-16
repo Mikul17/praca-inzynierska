@@ -54,7 +54,7 @@ class AlgorithmServiceTest {
                 "coolingRate", 0.95
         );
 
-        ScheduleRequest request = new ScheduleRequest(AlgorithmName.SIMULATED_ANNEALING, new ArrayList<>(), parameters);
+        ScheduleRequest request = new ScheduleRequest(AlgorithmName.SIMULATED_ANNEALING, new ArrayList<>(),0, parameters);
 
         SimulatedAnnealingParameters saParams = SimulatedAnnealingParameters.builder()
                 .tasks(request.tasks())
@@ -93,7 +93,7 @@ class AlgorithmServiceTest {
                 "coolingRate", 0.95
         );
 
-        ScheduleRequest request = new ScheduleRequest(AlgorithmName.SIMULATED_ANNEALING, null, parameters);
+        ScheduleRequest request = new ScheduleRequest(AlgorithmName.SIMULATED_ANNEALING, null,0, parameters);
 
         SimulatedAnnealingParameters saParams = SimulatedAnnealingParameters.builder()
                 .tasks(request.tasks())
@@ -179,8 +179,8 @@ class AlgorithmServiceTest {
                 "preemptive", true
         );
 
-        ScheduleRequest request1 = new ScheduleRequest(AlgorithmName.SIMULATED_ANNEALING, null, parameters1);
-        ScheduleRequest request2 = new ScheduleRequest(AlgorithmName.CARLIER, null, parameters2);
+        ScheduleRequest request1 = new ScheduleRequest(AlgorithmName.SIMULATED_ANNEALING, null,0, parameters1);
+        ScheduleRequest request2 = new ScheduleRequest(AlgorithmName.CARLIER, null,0, parameters2);
 
         SimulatedAnnealingParameters saParams = SimulatedAnnealingParameters.builder()
                 .tasks(request1.tasks())

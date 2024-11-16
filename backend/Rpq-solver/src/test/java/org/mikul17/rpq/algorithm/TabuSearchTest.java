@@ -28,6 +28,7 @@ public class TabuSearchTest {
                 .maxIterations(5)
                 .tabuListSize(2)
                 .isTenureDynamic(false)
+                .timeoutDuration(0)
                 .tasks(testTasks)
                 .build();
         Permutation result = ts.solve(p, solution -> {});
@@ -42,6 +43,7 @@ public class TabuSearchTest {
                 .builder()
                 .maxIterations(5)
                 .isTenureDynamic(true)
+                .timeoutDuration(0)
                 .initialTenure(3)
                 .tasks(testTasks)
                 .build();

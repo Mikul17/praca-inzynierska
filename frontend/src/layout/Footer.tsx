@@ -13,7 +13,7 @@ interface FooterProps {
 
 export default function Footer({ height }: FooterProps) {
   const { isFileLoaded, downloadFile } = useFile();
-  const { bestOrder } = useTaskContext();
+  const { bestSolution } = useTaskContext();
   const [orderOnly, setIsOrderOnly] = useState<boolean>(false);
   const [selectedFormat, setSelectedFormat] = useState<string>();
 
@@ -22,7 +22,7 @@ export default function Footer({ height }: FooterProps) {
       selectedFormat &&
       (selectedFormat === "csv" || selectedFormat === "txt")
     ) {
-      downloadFile(selectedFormat, orderOnly, bestOrder);
+      downloadFile(selectedFormat, orderOnly, bestSolution.order);
     }
   };
 

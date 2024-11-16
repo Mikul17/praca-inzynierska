@@ -17,9 +17,11 @@ export interface TaskRequest {
 }
 
 export interface TabuMove {
+    id: number;
     firstTaskId: number;
     secondTaskId: number;
     moveCmax: number;
+    tenure: number;
 }
 
 export interface Solution {
@@ -27,38 +29,13 @@ export interface Solution {
     cmax: number;
 }
 
-export interface SolutionNode {
-    parent?: SolutionNode;
-    children: SolutionNode[];
-    permutation: Solution;
+export interface TreeNode {
+    "@id": number;
+    parent: TreeNode | number | null;
+    children: Array<TreeNode>;
+    permutation: Solution | null;
     ub: number;
     lb: number;
     pruned: boolean;
-}
-
-export interface SimulatedAnnealingResponse {
-    propabilities: Array<number>;
-    temperatures: Array<number>;
-    permutations: Array<Solution>;
-    bestSolution: Solution;
-}
-
-export interface TabuSearchResponse {
-    tabuList: Array<TabuMove>;
-    permutations: Array<Solution>;
-    bestSolution: Solution;
-}
-
-export interface SchrageResponse {
-    readyQueue: Array<number>;
-    notReadyQueue: Array<number>;
-    permutations: Array<Solution>;
-    bestSolution: Solution;
-}
-
-export interface CarlierResponse {
-    permutations: Array<Solution>;
-    bestSolution: Solution;
-    ub: number;
-    node: SolutionNode;
-}
+    active: boolean;
+  }

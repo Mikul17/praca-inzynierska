@@ -17,4 +17,8 @@ public class TabuSearchBatchedSolution extends BatchedSolution {
        this.tabuList.addAll(tabuList);
    }
 
+   public void appendTabuMove(TabuMove move){
+         this.tabuList.add(move);
+   }
+
 }

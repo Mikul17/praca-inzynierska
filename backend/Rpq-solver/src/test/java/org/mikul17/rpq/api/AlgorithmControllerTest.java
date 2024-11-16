@@ -35,7 +35,7 @@ class AlgorithmControllerTest {
 
     @Test
     void shouldStartAlgorithm() throws Exception {
-        ScheduleRequest request = new ScheduleRequest(AlgorithmName.CARLIER, null, null);
+        ScheduleRequest request = new ScheduleRequest(AlgorithmName.CARLIER, null,0, null);
 
         doNothing().when(algorithmService).startAlgorithm(any(ScheduleRequest.class), anyString());
 
@@ -49,7 +49,7 @@ class AlgorithmControllerTest {
 
     @Test
     void shouldThrowUnableToStartConnectionException () throws Exception {
-        ScheduleRequest request = new ScheduleRequest(AlgorithmName.SIMULATED_ANNEALING, null, null);
+        ScheduleRequest request = new ScheduleRequest(AlgorithmName.SIMULATED_ANNEALING, null,0, null);
 
         doThrow(new UnableToStartConnectionException("Error starting algorithm")).when(algorithmService).startAlgorithm(any(ScheduleRequest.class), anyString());
 
@@ -64,7 +64,7 @@ class AlgorithmControllerTest {
 
     @Test
     void shouldThrowUnsupportedOperationException () throws Exception {
-        ScheduleRequest request = new ScheduleRequest(AlgorithmName.SIMULATED_ANNEALING, null, null);
+        ScheduleRequest request = new ScheduleRequest(AlgorithmName.SIMULATED_ANNEALING, null,0, null);
         // Set the required fields in ScheduleRequest object
 
         doThrow(new UnsupportedOperationException("Error creating algorithm parameters")).when(algorithmService).startAlgorithm(any(ScheduleRequest.class), anyString());
@@ -80,7 +80,7 @@ class AlgorithmControllerTest {
 
     @Test
     void shouldThrowException() throws Exception {
-        ScheduleRequest request = new ScheduleRequest(AlgorithmName.SIMULATED_ANNEALING, null, null);
+        ScheduleRequest request = new ScheduleRequest(AlgorithmName.SIMULATED_ANNEALING, null,0, null);
 
         doThrow(new RuntimeException("Unexpected error")).when(algorithmService).startAlgorithm(any(ScheduleRequest.class), anyString());
 

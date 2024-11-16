@@ -7,7 +7,7 @@ interface UseAnimationEffectProps {
   onAnimationEnd?: () => void;
   onAnimationStart?: () => void;
   canAdvanceFrame?: (frame: number) => boolean;
-  isDataFetchingCompleted?: boolean; // Added prop
+  isDataFetchingCompleted?: boolean;
 }
 
 interface UseAnimationEffectReturn {
@@ -18,7 +18,7 @@ interface UseAnimationEffectReturn {
   pause: () => void;
   setSpeed: (speed: number) => void;
   reset: () => void;
-  hasAnimationEnded: boolean; // Added return type
+  hasAnimationEnded: boolean;
 }
 
 const useAnimationEffect = ({
@@ -51,7 +51,7 @@ const useAnimationEffect = ({
         return prevFrame;
       }
 
-      // Call onFrameChange when frame advances
+
       onFrameChange(nextFrame);
 
       return nextFrame;
@@ -76,7 +76,7 @@ const useAnimationEffect = ({
       onAnimationStart();
     }
     setIsPlaying(true);
-    // Call onFrameChange when animation starts
+
     onFrameChange(currentFrame);
   }, [onAnimationStart, onFrameChange, currentFrame]);
 

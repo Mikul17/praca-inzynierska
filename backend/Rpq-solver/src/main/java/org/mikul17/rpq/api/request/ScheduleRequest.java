@@ -9,5 +9,6 @@ import java.util.Map;
 public record ScheduleRequest(
         AlgorithmName algorithm,
         List<Task> tasks,
+        int timeoutDuration,
         Map<String, Object> parameters
 ){}

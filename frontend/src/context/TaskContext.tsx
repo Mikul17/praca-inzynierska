@@ -1,5 +1,5 @@
 "use client";
-import { Solution, TabuMove, Task } from "@/common/types";
+import { Solution, TabuMove, Task, TreeNode } from "@/common/types";
 import toast from "react-hot-toast";
 import React, {
   createContext,
@@ -7,7 +7,6 @@ import React, {
   useState,
   useCallback,
   useRef,
-  useEffect,
 } from "react";
 
 interface TaskContextType {
@@ -19,6 +18,13 @@ interface TaskContextType {
   currentSolution: Solution | null;
   bestSolution: Solution | null;
   isDataFetchingCompleted: boolean;
+  displayTemperatures: Array<number>;
+  displayProbabilities: Array<number>;
+  displayCmax: Array<number>;
+  rootNode: TreeNode | null;
+  readyQueue: Array<number>;
+  notReadyQueue: Array<number>;
+  tabuList: Array<TabuMove>;
   setIsDataFetchingCompleted: (isCompleted: boolean) => void;
   createSolution: (order: Array<number>) => void;
   calculateCmax: (order: Array<number>) => number;
@@ -35,11 +41,21 @@ interface TaskContextType {
     solutions: Array<Solution>,
     tabuList: Array<TabuMove>
   ) => void;
-  setSolutionForAnimation: (solution: Solution) => void;
+  updateSchrageSolution: (
+    solutions: Array<Solution>,
+    nonReadyQueue: Array<number>,
+    readyQueue: Array<number>,
+    bestSolution: Solution
+  ) => void;
+  updateCarlierSolution: (
+    solutions: Array<Solution>,
+    rootNode: TreeNode
+  ) => void;
+  setSolutionForAnimation: (solution: Solution, currentAlgorithm: string) => void;
+  updateSolutionCharts: (frame: number) => void;
   validateOrder: (order: Array<number>) => boolean;
   resetRecentlyChangedTasks: () => void;
   clearAnimationData: () => void;
-  displayTemperatures: Array<number>;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -78,11 +94,16 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
   const [temperatures, setTemperatures] = useState<Array<number>>([]);
   const [probabilities, setProbabilities] = useState<Array<number>>([]);
   const [displayTemperatures, setDisplayTemperatures] = useState<Array<number>>([]);
+  const [displayProbabilities, setDisplayProbabilities] = useState<Array<number>>([]);
+  const [displayCmax, setDisplayCmax] = useState<Array<number>>([]);
   //Tabu Search
   const [tabuList, setTabuList] = useState<TabuMove[]>([]);
+  const [isDynamicTenure, setIsDynamicTenure] = useState<boolean>(false);
   //Schrage Algorithm
   const [readyQueue, setReadyQueue] = useState<Array<number>>([]);
   const [notReadyQueue, setNotReadyQueue] = useState<Array<number>>([]);
+  //Carlier Algorithm
+  const [rootNode, setRootNode] = useState<TreeNode | null>(null);
 
   const calculateCmax = (order: Array<number>): number => {
     let cmax = 0;
@@ -183,9 +204,9 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
   };
 
   const setSolutionForAnimation = useCallback(
-    (solution: Solution) => {
+    (solution: Solution, currentAlgorithm: string) => {
       if (solution) {
-        if (solution.cmax < bestSolution.cmax) {
+        if (solution.cmax < bestSolution.cmax && currentAlgorithm !== 'SchrageAlgorithm') {
           setBestSolution(solution);
         }
         setCurrentSolution(solution);
@@ -196,6 +217,29 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
     },
     [bestSolution, setBestSolution, updateRecentlyChanged]
   );
+
+  const updateSolutionCharts = useCallback((frame: number) => {
+      if(temperatures[frame] !== undefined){
+        setDisplayTemperatures((prev) => {
+          const newTemperatures = [...prev, temperatures[frame]];
+          return newTemperatures.slice(-MAX_DATA_POINTS);
+        });
+        }
+        if(probabilities[frame] !== undefined){
+          setDisplayProbabilities((prev) => {
+            const newProbabilities = [...prev, probabilities[frame]];
+            return newProbabilities.slice(-MAX_DATA_POINTS);
+          });
+        }
+        if(solutions[frame] !== undefined){
+        setDisplayCmax((prev) => {
+          const newCmax = [...prev, solutions[frame].cmax];
+          return newCmax.slice(-MAX_DATA_POINTS);
+        });
+        }
+      }, [temperatures, probabilities, solutions]);
+
+
   const updateAllSolutions = useCallback(
     (incomingSolutions: Array<Solution>) => {
       setSolutions((prevSolutions) => {
@@ -227,12 +271,10 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
     (incomingSolutions, incomingTemperatures, incomingProbabilities) => {
       updateAllSolutions(incomingSolutions);
       setTemperatures((prev) => {
-        const newTemperatures = [...prev, ...incomingTemperatures];
-        return newTemperatures.slice(-MAX_DATA_POINTS);
+        return[...prev, ...incomingTemperatures];
       });
       setProbabilities((prev) => {
-        const newProbabilities = [...prev, ...incomingProbabilities];
-        return newProbabilities.slice(-MAX_DATA_POINTS);
+        return[...prev, ...incomingProbabilities];
       });
     },
     []
@@ -241,13 +283,23 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
   const updateTabuSearchSolution = useCallback(
     (incomingSolutions, incomingTabuList) => {
       updateAllSolutions(incomingSolutions);
-      setTabuList((prev) => {
-        const newTabuList = [...prev, ...incomingTabuList];
-        return newTabuList.slice(-MAX_DATA_POINTS);
-      });
+      setTabuList(incomingTabuList);
     },
     []
   );
+
+
+  const updateSchrageSolution = (incomingSolutions, incomingNonReadyQueue, incomingReadyQueue, bestSolution) => {
+    updateAllSolutions(incomingSolutions);
+    setBestSolution(bestSolution)
+    setNotReadyQueue(incomingNonReadyQueue);
+    setReadyQueue(incomingReadyQueue);
+  };
+
+  const updateCarlierSolution = (incomingSolutions, rootNode) => {
+    updateAllSolutions(incomingSolutions);
+    setRootNode(rootNode);
+  };
 
   const clearAnimationData = () => {
     setSolutions([]);
@@ -261,12 +313,19 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
     tasks,
     temperatures,
     displayTemperatures,
+    displayProbabilities,
+    displayCmax,
+    readyQueue,
+    notReadyQueue,
+    isDynamicTenure,
+    rootNode,
     probabilities,
     solutions,
     recentlyChangedTasks,
     currentSolution,
     bestSolution,
     isDataFetchingCompleted,
+    tabuList,
     setIsDataFetchingCompleted,
     updateSolution,
     createSolution,
@@ -277,6 +336,9 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
     validateOrder,
     updateSimulatedAnnealingSolution,
     updateTabuSearchSolution,
+    updateSchrageSolution,
+    updateCarlierSolution,
+    updateSolutionCharts,
     resetRecentlyChangedTasks,
     clearAnimationData,
   };

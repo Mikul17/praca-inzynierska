@@ -5,69 +5,95 @@ import GanttChartSection from "./Gantt/GanttChartSection";
 import ChartCard from "./ChartCard";
 import Gap from "./Gap";
 import { useAlgorithm } from "@/context/AlgorithmContext";
-
+import TabuList from "@/components/content/TabuList";
+import QueueVisualizer from "@/components/content/QueueVisualizer";
+import ProbabilityChart from "@/components/content/ProbabilityChart";
+import TreeChart from "@/components/TreeVisualizer/TreeChart";
 interface LayoutProps {
   readonly height: number;
 }
 
 const GraphPage = memo(({ height }: LayoutProps) => {
-  const { solutions, temperatures, probabilities } = useTaskContext();
+  const { solutions, displayTemperatures, displayProbabilities, displayCmax, readyQueue, notReadyQueue, rootNode } =
+    useTaskContext();
   const { currentAlgorithm } = useAlgorithm();
+
+  const dataExists = useMemo(() => solutions.length > 0 || notReadyQueue.length > 0 || readyQueue.length>0 || (rootNode !== undefined && rootNode !== null), [solutions]);
+
 
   const generateCharts = useMemo(() => {
     const charts = [];
-    const cmaxHistory = solutions.map((solution) => solution.cmax);
     switch (currentAlgorithm) {
       case "SimulatedAnnealing":
         charts.push(
           <SolutionChart
-            data={cmaxHistory}
+            data={displayCmax}
             title={"Cmax"}
-            xAxisTitle={"Iteration"}
-            yAxisTitle={"Cmax"}
-            key="cmax"
+            yAxisTitle={"Iteration"}
+            xAxisTitle={"Cmax"}
+            key="cmaxSA"
           />
         );
         charts.push(
           <SolutionChart
-            data={temperatures}
+            data={displayTemperatures}
             title={"Temperature"}
-            xAxisTitle={"Iteration"}
-            yAxisTitle={"Temperature"}
-            key="temperature"
+            yAxisTitle={"Iteration"}
+            xAxisTitle={"Temperature"}
+            key="temperatureSA"
           />
         );
         charts.push(
-          <SolutionChart
-            data={probabilities}
+          <ProbabilityChart
+            data={displayProbabilities}
             title={"Probability"}
-            xAxisTitle={"Iteration"}
-            yAxisTitle={"Acceptance %"}
-            key="probability"
+            yAxisTitle={"Iteration"}
+            xAxisTitle={"Acceptance %"}
+            key="probabilitySA"
           />
         );
         return charts;
       case "TabuSearch":
-        charts.push(<SolutionChart data={cmaxHistory} title={"Cmax"} xAxisTitle={"cmax"} yAxisTitle={"iteration"} />);
+        charts.push(
+          <SolutionChart
+            data={displayCmax}
+            title={"Cmax"}
+            yAxisTitle={"Iteration"}
+            xAxisTitle={"Cmax"}
+            key="cmaxTS"
+          />
+        );
+        charts.push(<Gap size={32} orientation="horizontal" key="gapTS" />);
+        charts.push(<TabuList key="tabuList" />);
         return charts;
-       case "SchrageAlgorithm":
-        charts.push(<SolutionChart data={cmaxHistory} title={"Cmax"} xAxisTitle={"cmax"} yAxisTitle={"iteration"} />);
+      case "SchrageAlgorithm":
+        charts.push(<QueueVisualizer key="queueVisualizer" label="Not Ready Queue" data={notReadyQueue}/>);
+        charts.push(<QueueVisualizer key="queueVisualizer" label="Ready Queue" data={readyQueue}/>);
         return charts;
-       case "CarlierAlgorithm":
-        charts.push(<SolutionChart data={cmaxHistory} title={"Cmax"} xAxisTitle={"cmax"} yAxisTitle={"iteration"} />);
+      case "CarlierAlgorithm":
+        charts.push(
+          <TreeChart data={rootNode} height={height - 32 - 100}/>
+        );
         return charts;
-        default:
+      default:
         return charts;
-  }
-}, [currentAlgorithm, solutions, temperatures, probabilities]);
+    }
+  }, [
+    currentAlgorithm,
+    solutions,
+    displayTemperatures,
+    displayProbabilities,
+    displayCmax,
+    rootNode
+  ]);
 
   return (
-    <div style={{ height: height}} className="flex w-full">
+    <div style={{ height: height }} className="flex w-full">
       <GanttChartSection />
-      <Gap size={32} orientation="vertical"/>
-      {/* <ChartCard height={height - 32 - 100}>
-        {generateCharts}
-       </ChartCard> */}
+      <Gap size={32} orientation="vertical" />
+      <ChartCard height={height - 32 - 100}>
+        {dataExists && generateCharts}
+        </ChartCard>
     </div>
   );
 });

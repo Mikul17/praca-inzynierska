@@ -95,24 +95,28 @@ public class AlgorithmService {
             case SIMULATED_ANNEALING:
                 SimulatedAnnealingParameters saParams = SimulatedAnnealingParameters.builder()
                         .tasks(request.tasks())
+                        .timeoutDuration(request.timeoutDuration() * 1000)
                         .build();
                 saParams.fromMap(request.parameters());
                 return saParams;
             case TABU_SEARCH:
                 TabuSearchParameters tsParams = TabuSearchParameters.builder()
                         .tasks(request.tasks())
+                        .timeoutDuration(request.timeoutDuration() * 1000)
                         .build();
                 tsParams.fromMap(request.parameters());
                 return tsParams;
             case SCHRAGE:
                 SchrageParameters schrageParams = SchrageParameters.builder()
                         .tasks(request.tasks())
+                        .timeoutDuration(request.timeoutDuration() * 1000)
                         .build();
                 schrageParams.fromMap(request.parameters());
                 return schrageParams;
             case CARLIER:
                 return CarlierParameters.builder()
                         .tasks(request.tasks())
+                        .timeoutDuration(request.timeoutDuration() * 1000)
                         .build();
             default:
                 throw new IllegalArgumentException("Unknown algorithm: " + request.algorithm());
