@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "lint-fix": "next lint --fix",
-     "prod": "npm run build && npm start"
+    "prod": "npm run build && npm start"
   },
   "dependencies": {
     "@nextui-org/react": "^2.4.7",
@@ -17,6 +17,7 @@
     "lodash": "^4.17.21",
     "next": "^14.2.15",
     "react": "^18",
+    "react-d3-tree": "^3.6.2",
     "react-dom": "^18",
     "react-dropzone": "^14.2.3",
     "react-google-charts": "^5.1.0",

@@ -37,4 +37,5 @@ export interface TreeNode {
     ub: number;
     lb: number;
     pruned: boolean;
+    active: boolean;
   }

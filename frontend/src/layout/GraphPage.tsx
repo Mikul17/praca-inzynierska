@@ -8,8 +8,7 @@ import { useAlgorithm } from "@/context/AlgorithmContext";
 import TabuList from "@/components/content/TabuList";
 import QueueVisualizer from "@/components/content/QueueVisualizer";
 import ProbabilityChart from "@/components/content/ProbabilityChart";
-import TreeChart from "@/components/content/TreeChart";
-import { TreeNode } from "@/common/types";
+import TreeChart from "@/components/TreeVisualizer/TreeChart";
 interface LayoutProps {
   readonly height: number;
 }
@@ -19,7 +18,7 @@ const GraphPage = memo(({ height }: LayoutProps) => {
     useTaskContext();
   const { currentAlgorithm } = useAlgorithm();
 
-  const dataExists = useMemo(() => solutions.length > 0 || notReadyQueue.length > 0 || readyQueue.length>0, [solutions]);
+  const dataExists = useMemo(() => solutions.length > 0 || notReadyQueue.length > 0 || readyQueue.length>0 || (rootNode !== undefined && rootNode !== null), [solutions]);
 
 
   const generateCharts = useMemo(() => {
@@ -73,7 +72,7 @@ const GraphPage = memo(({ height }: LayoutProps) => {
         return charts;
       case "CarlierAlgorithm":
         charts.push(
-          <TreeChart data={rootNode}/>
+          <TreeChart data={rootNode} height={height - 32 - 100}/>
         );
         return charts;
       default:
@@ -92,7 +91,9 @@ const GraphPage = memo(({ height }: LayoutProps) => {
     <div style={{ height: height }} className="flex w-full">
       <GanttChartSection />
       <Gap size={32} orientation="vertical" />
-        <ChartCard height={height - 32 - 100}>{generateCharts}</ChartCard>
+      <ChartCard height={height - 32 - 100}>
+        {dataExists && generateCharts}
+        </ChartCard>
     </div>
   );
 });
