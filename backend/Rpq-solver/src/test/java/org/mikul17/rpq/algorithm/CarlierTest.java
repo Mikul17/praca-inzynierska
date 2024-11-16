@@ -23,6 +23,7 @@ public class CarlierTest {
         CarlierParameters p = CarlierParameters
                 .builder()
                 .tasks(schrageTest1)
+                .timeoutDuration(0)
                 .build();
         Permutation result = carlier.solve(p, solution -> {});
 
@@ -34,6 +35,7 @@ public class CarlierTest {
         CarlierParameters p = CarlierParameters
                 .builder()
                 .tasks(schrageTest2)
+                .timeoutDuration(0)
                 .build();
         Permutation result = carlier.solve(p, solution -> {});
 
@@ -45,6 +47,7 @@ public class CarlierTest {
         CarlierParameters p = CarlierParameters
                 .builder()
                 .tasks(schrageTest3)
+                .timeoutDuration(0)
                 .build();
         Permutation result = carlier.solve(p, solution -> {});
 

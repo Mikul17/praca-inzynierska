@@ -24,6 +24,7 @@ public class SchrageTest {
         SchrageParameters p = SchrageParameters
                 .builder()
                 .tasks(schrageTest1)
+                .timeoutDuration(0)
                 .preemptive(false)
                 .build();
         Permutation result = schrage.solve(p, solution -> {});
@@ -36,6 +37,7 @@ public class SchrageTest {
         SchrageParameters p = SchrageParameters
                 .builder()
                 .tasks(schrageTest2)
+                .timeoutDuration(0)
                 .preemptive(false)
                 .build();
         Permutation result = schrage.solve(p, solution -> {});
@@ -48,6 +50,7 @@ public class SchrageTest {
         SchrageParameters p = SchrageParameters
                 .builder()
                 .tasks(schrageTest3)
+                .timeoutDuration(0)
                 .preemptive(false)
                 .build();
         Permutation result = schrage.solve(p, solution -> {});
@@ -60,6 +63,7 @@ public class SchrageTest {
         SchrageParameters p = SchrageParameters
                 .builder()
                 .tasks(schrageTest1)
+                .timeoutDuration(0)
                 .preemptive(true)
                 .build();
         Permutation result = schrage.solve(p, solution -> {});
@@ -72,6 +76,7 @@ public class SchrageTest {
         SchrageParameters p = SchrageParameters
                 .builder()
                 .tasks(schrageTest2)
+                .timeoutDuration(0)
                 .preemptive(true)
                 .build();
         Permutation result = schrage.solve(p, solution -> {});
@@ -84,6 +89,7 @@ public class SchrageTest {
         SchrageParameters p = SchrageParameters
                 .builder()
                 .tasks(schrageTest3)
+                .timeoutDuration(0)
                 .preemptive(true)
                 .build();
         Permutation result = schrage.solve(p, solution -> {});
