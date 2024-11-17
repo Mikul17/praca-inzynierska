@@ -6,24 +6,10 @@ import org.mikul17.rpq.algorithms.common.*;
 import java.util.*;
 import java.util.function.Consumer;
 
-/**
- * Class that represents Tabu Search algorithm.
- * It finds the best permutation by going through all possible permutations.
- * To avoid local optima, it uses tabu list to store forbidden moves.
- * It repeats the process for a given number of iterations, for each iteration
- * it finds the best move to make and adds it to tabu list. If the move is better
- * than the previous one, it updates the best permutation.
- */
+
 public class TabuSearch implements Algorithm<TabuSearchParameters, TabuSearchBatchedSolution> {
 
-    /**
-     * Solves the scheduling problem using the Tabu Search algorithm.
-     *
-     * @param parameters - contains all necessary parameters for the Tabu Search algorithm
-     * @return TabuSearchSolution - object containing the best permutation and Cmax value
-     * @see TabuSearchParameters
-     * @see TabuSearchBatchedSolution
-     */
+
     @SneakyThrows
     @Override
     public Permutation solve(TabuSearchParameters parameters, Consumer<TabuSearchBatchedSolution> solutionConsumer) {
@@ -38,6 +24,11 @@ public class TabuSearch implements Algorithm<TabuSearchParameters, TabuSearchBat
         List<Permutation> solutions = new ArrayList<>();
 
         for (int i = 0; i < parameters.maxIterations; i++) {
+            if(parameters.resizeTabuList){
+                tabuList = resizeTabuList(tabuList, parameters.tabuListSize);
+                parameters.resizeTabuList = false;
+            }
+
             TabuMove result = findBestTabu(copy, tabuList, parameters, bestCmax, solutions);
             int currentlyBestCmax = result.getMoveCmax();
             Collections.swap(copy, result.getFirstTask(), result.getSecondTask());
@@ -96,7 +87,7 @@ public class TabuSearch implements Algorithm<TabuSearchParameters, TabuSearchBat
         int initialTenure = parameters.initialTenure;
 
         int totalIterations = (copy.size() * (copy.size() - 1)) / 2;
-        int samplingInterval = Math.max(totalIterations / 99, 1);
+        int samplingInterval = Math.max(totalIterations / 9, 1);
 
         int iterationCount = 0;
 
