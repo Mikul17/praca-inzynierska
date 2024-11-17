@@ -54,7 +54,7 @@ public class SimulatedAnnealing implements Algorithm<SimulatedAnnealingParameter
             }
             batchedSolution.addTemperature(currentTemperature);
 
-            if(i % 100 == 99 || i == parameters.maxIterations - 1) {
+            if(i % 10 == 9 || i == parameters.maxIterations - 1) {
                 bestSolution.setBestCmax(bestCmax);
                 bestSolution.setBestOrder(bestPermutation != null ? bestPermutation.permutation() : null);
                 batchedSolution.setBestSolution(bestSolution);

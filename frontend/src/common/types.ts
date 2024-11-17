@@ -39,3 +39,10 @@ export interface TreeNode {
     pruned: boolean;
     active: boolean;
   }
+
+export interface AlgorithmParameters {
+    tasks: Array<Task>;
+    algorithm: string;
+    timeoutDuration: number;
+    parameters: Record<string, any>;
+}

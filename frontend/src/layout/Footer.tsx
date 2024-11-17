@@ -6,6 +6,7 @@ import { Checkbox } from "@nextui-org/react";
 import { useState } from "react";
 import { useFile } from "@/context/FileContext";
 import { useTaskContext } from "@/context/TaskContext";
+import { useLock } from "@/context/LockContext";
 
 interface FooterProps {
   height: number | string;
@@ -16,6 +17,7 @@ export default function Footer({ height }: FooterProps) {
   const { bestSolution } = useTaskContext();
   const [orderOnly, setIsOrderOnly] = useState<boolean>(false);
   const [selectedFormat, setSelectedFormat] = useState<string>();
+  const { lock } = useLock();
 
   const handleDownload = () => {
     if (
@@ -52,7 +54,8 @@ export default function Footer({ height }: FooterProps) {
           color="success"
           isDisabled={
             !isFileLoaded ||
-            !(selectedFormat === "csv" || selectedFormat === "txt")
+            !(selectedFormat === "csv" || selectedFormat === "txt") ||
+            lock
           }
           onClick={handleDownload}
         >

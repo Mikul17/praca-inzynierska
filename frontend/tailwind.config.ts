@@ -18,6 +18,7 @@ const config: Config = {
       },
       boxShadow: {
         "outer-shadow": "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+        "inner-shadow": "inset 0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
       },
       borderWidth: {
         3: '3px',

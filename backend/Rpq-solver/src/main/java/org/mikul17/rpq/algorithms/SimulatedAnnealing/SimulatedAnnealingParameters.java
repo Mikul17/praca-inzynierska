@@ -23,11 +23,23 @@ public class SimulatedAnnealingParameters extends AlgorithmParameters {
     private final ReentrantLock lock = new ReentrantLock();
     private SimulatedAnnealingParameters pendingChanges;
 
+    private Double getDoubleValue(Map<String, Object> map, String key) {
+        Object value = map.get(key);
+        System.out.println("Value: " + value);
+        if (value instanceof Integer) {
+            return ((Integer) value).doubleValue();
+        } else if (value instanceof Double) {
+            return (Double) value;
+        } else {
+            throw new IllegalArgumentException("Invalid type for " + key + ": " + value);
+        }
+    }
+
     @Override
     public void fromMap (Map<String, Object> map) {
         maxIterations = (int) map.get("maxIterations");
-        initialTemperature = (double) map.get("initialTemperature");
-        coolingRate = (double) map.get("coolingRate");
+        initialTemperature =  getDoubleValue(map, "initialTemperature");
+        coolingRate = getDoubleValue(map, "coolingRate");
     }
 
     @Override

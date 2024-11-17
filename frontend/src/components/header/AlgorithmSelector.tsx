@@ -1,8 +1,13 @@
 import { useAlgorithm, AlgorithmType, AlgorithmTypeKeys, AlgorithmDisplayNames } from "@/context/AlgorithmContext";
+import { useLock } from "@/context/LockContext";
+import { useParameters } from "@/context/ParameterContext";
 import { Select, SelectItem } from "@nextui-org/select";
 
 export default function AlgorithmSelector() {
   const { currentAlgorithm, setCurrentAlgorithm } = useAlgorithm();
+  const { resetParameters } = useParameters();
+  const { lock } = useLock();
+
 
   return (
     <Select<typeof AlgorithmType>
@@ -14,9 +19,13 @@ export default function AlgorithmSelector() {
       size="lg"
       placeholder="Select an algorithm"
       selectedKeys={currentAlgorithm ? [currentAlgorithm] : []}
-      onChange={(e) => setCurrentAlgorithm(e.target.value as AlgorithmTypeKeys)}
+      onChange={(e) => {
+        resetParameters();
+        setCurrentAlgorithm(e.target.value as AlgorithmTypeKeys)
+      }}
       aria-label="Select an algorithm"
       disabledKeys={[currentAlgorithm]}
+      isDisabled={lock}
     >
       {Object.values(AlgorithmType).map((algorithm) => (
         <SelectItem

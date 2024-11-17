@@ -1,46 +1,20 @@
-import { AlgorithmApiNames, AlgorithmTypeKeys } from "@/context/AlgorithmContext"
-import { Task } from "./types"
+import { AlgorithmParameters, Task } from "./types"
+import toast from "react-hot-toast"
 
 // Api configuration
 export const API_URL = 'http://localhost:8080'
 export const START_ALGORITHM_URL = '/start_scheduling'
 
-const algorithmParameters: Record<AlgorithmTypeKeys, any> = {
-    SimulatedAnnealing: {
-        initialTemperature: 1000.2,
-        coolingRate: 0.8585,
-        maxIterations: 1500,
-    },
-    TabuSearch: {
-        tabuListSize: 48,
-        isTenureDynamic: true,
-        initialTenure: 10,
-        maxIterations: 1000,
-    },
-    SchrageAlgorithm: {
-        preemptive: false,
-    },
-    CarlierAlgorithm: {
-    }
-}
 
-
-
-export const startScheduler = async (algorithm: AlgorithmTypeKeys, tasks: Task[]) => {
-    const parameters = algorithmParameters[algorithm];
+export const startScheduler = async (algorithmParameters: AlgorithmParameters) => {
     const payload = {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            algorithm: AlgorithmApiNames[algorithm],
-            timeoutDuration: 2,
-            tasks: tasks,
-            parameters: parameters
-        })
+        body: JSON.stringify(algorithmParameters)
     };
-    console.log('Payload:', payload);
+    console.log('payload:', payload);
     try {
         const response = await fetch(API_URL + START_ALGORITHM_URL, payload);
         console.log
@@ -50,6 +24,7 @@ export const startScheduler = async (algorithm: AlgorithmTypeKeys, tasks: Task[]
         }
         return response.text();
     } catch (error) {
+        toast.error('Error starting algorithm');
         console.error('Error starting algorithm:', error);
     }
 };
