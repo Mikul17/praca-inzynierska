@@ -11,7 +11,7 @@ interface ChartProps {
 const SolutionChart = memo(function SolutionChart({ data, title, xAxisTitle, yAxisTitle }: ChartProps) {
   const chartData = useMemo(() => {
     if (data.length > 0) {
-      const mappedData: Array<(string | number)[]> = [[xAxisTitle, yAxisTitle]];
+      const mappedData: Array<(string | number)[]> = [[yAxisTitle, xAxisTitle]];
       data.forEach((value, index) => {
         mappedData.push([index + 1, value]);
       });

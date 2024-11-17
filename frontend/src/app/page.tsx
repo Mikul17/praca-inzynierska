@@ -7,7 +7,6 @@ import Footer from "@/layout/Footer";
 import Gap from "@/layout/Gap";
 import Header from "@/layout/Header";
 import PageContent from "@/layout/PageContent";
-import { Modal } from "@nextui-org/modal";
 import { Spinner } from "@nextui-org/spinner";
 
 export default function Home() {

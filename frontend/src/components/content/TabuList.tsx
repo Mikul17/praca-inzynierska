@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTaskContext } from "@/context/TaskContext";
 import {
   getKeyValue,
@@ -7,6 +8,7 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
+  Pagination,
 } from "@nextui-org/react";
 
 interface Column {
@@ -16,6 +18,8 @@ interface Column {
 
 export default function TabuList() {
   const { tabuList } = useTaskContext();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   const columns: Array<Column> = [
     {
@@ -36,6 +40,10 @@ export default function TabuList() {
     },
   ];
 
+  // Calculate the items for the current page
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentItems = tabuList.slice(startIndex, startIndex + itemsPerPage);
+
   return (
     <div>
       <Table aria-label="Tabu List Table">
@@ -44,20 +52,27 @@ export default function TabuList() {
             <TableColumn key={column.key}>{column.label}</TableColumn>
           ))}
         </TableHeader>
-        <TableBody items={tabuList}>
+        <TableBody items={currentItems}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
                 <TableCell>
-                {columnKey === "tenure" && item[columnKey] === -1
-                  ? "-"
-                  : getKeyValue(item, columnKey)}
-              </TableCell>
+                  {columnKey === "tenure" && item[columnKey] === -1
+                    ? "-"
+                    : getKeyValue(item, columnKey)}
+                </TableCell>
               )}
             </TableRow>
           )}
         </TableBody>
       </Table>
+      <Pagination
+        total={Math.ceil(tabuList.length / itemsPerPage)}
+        initialPage={1}
+        page={currentPage}
+        onChange={(page) => setCurrentPage(page)}
+        className="mt-4"
+      />
     </div>
   );
 }

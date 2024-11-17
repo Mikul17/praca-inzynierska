@@ -3,6 +3,8 @@ import { AlgorithmProvider } from "../context/AlgorithmContext";
 import { FileProvider } from "../context/FileContext";
 import { TaskProvider } from "./TaskContext";
 import ContextSynchronizer from "./ContextSynchronizer";
+import { ParameterContextProvider } from "./ParameterContext";
+import { LockContextProvider } from "./LockContext";
 
 export function MainProvider({children}: { children: React.ReactNode }) {
     return (
@@ -11,7 +13,11 @@ export function MainProvider({children}: { children: React.ReactNode }) {
                 <FileProvider>
                     <TaskProvider>
                         <ContextSynchronizer />
-                        {children}
+                        <ParameterContextProvider>
+                         <LockContextProvider>
+                            {children}
+                         </LockContextProvider>
+                        </ParameterContextProvider>
                     </TaskProvider>
                 </FileProvider>
             </AlgorithmProvider>

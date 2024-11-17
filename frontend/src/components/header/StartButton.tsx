@@ -9,6 +9,9 @@ import { useAlgorithm } from "@/context/AlgorithmContext";
 import { startScheduler } from "@/common/api";
 import useWebSocket from "@/hooks/useWebSocket";
 import toast from "react-hot-toast";
+import { useParameters } from "@/context/ParameterContext";
+import { AlgorithmParameters } from "@/common/types";
+import { useLock } from "@/context/LockContext";
 
 export default function StartButton() {
   const { isFileLoaded } = useFile();
@@ -21,10 +24,14 @@ export default function StartButton() {
     updateSolution,
     bestSolution,
     updateSolutionCharts,
+    finaliseSolution
   } = useTaskContext();
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const { isSendable, algorithmParameters  } = useParameters();
+  const { setLock } = useLock();
 
   const { setSessionId, connect } = useWebSocket();
+  const {  } = useParameters();
 
   const canAdvanceFrame = useCallback(
     (nextFrame) => {
@@ -44,15 +51,17 @@ export default function StartButton() {
   );
 
   const { play, currentFrame, isPlaying, hasAnimationEnded } = useAnimationEffect({
-    initialSpeed: 5.0,
+    initialSpeed: 1.0,
     onFrameChange,
     canAdvanceFrame,
     isDataFetchingCompleted,
-    onAnimationStart: () => console.log("Animation started"),
+    onAnimationStart: () => setLock(true),
     onAnimationEnd: () => setTimeout(() => {
       updateSolution(bestSolution);
       toast.success("Displaying best solution");
-    }, 1000) 
+      finaliseSolution();
+      setLock(false);
+    }, 500) 
   });
 
   useEffect(() => {
@@ -63,7 +72,18 @@ export default function StartButton() {
 
   const newHandleClick = async () => {
     try {
-      const response = await startScheduler(currentAlgorithm, tasks);
+      let parametersToSend : AlgorithmParameters = algorithmParameters;
+
+      if (currentAlgorithm === "CarlierAlgorithm") {
+        parametersToSend = {
+          algorithm: currentAlgorithm,
+          tasks,
+          timeoutDuration: 1,
+          parameters: {},
+        };
+      }
+
+      const response = await startScheduler(parametersToSend);
       if (response) {
         setSessionId(response);
         connect(response);
@@ -72,6 +92,7 @@ export default function StartButton() {
       console.error("Failed to start scheduler:", error);
     }
   };
+
 
   return (
     <Button
@@ -84,13 +105,18 @@ export default function StartButton() {
       }
       className="shadow-outer-shadow bg-secondary hover:bg-primary"
       size="lg"
-      isDisabled={!isFileLoaded}
+      isDisabled={!isFileLoaded || !isSendable}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={newHandleClick}
     >
-      {isFileLoaded ? "" : "Load data first"}
-      {isHovered ? "Start" : ""}
+    {!isFileLoaded
+      ? "Load data first"
+      : isHovered
+      ? "Start"
+      : !isSendable
+      ? "Provide parameters first"
+      : ""}
     </Button>
   );
 }

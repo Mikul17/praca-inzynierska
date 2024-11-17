@@ -5,7 +5,6 @@ import {
   Tooltip,
   Button,
   Modal,
-  useModal,
   ModalBody,
   ModalContent,
   ModalHeader,
@@ -137,7 +136,7 @@ export default function EmptyFilePageContent({ height }: LayoutProps) {
                     <Button color="danger" onPress={handleClose}>
                       Close
                     </Button>
-                    <Button color="success" onPress={handleGenerateSampleData}>
+                    <Button color="success" onPress={handleGenerateSampleData} className="text-white">
                       Generate
                     </Button>
                   </ModalFooter>

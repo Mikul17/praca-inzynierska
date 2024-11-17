@@ -56,6 +56,7 @@ interface TaskContextType {
   validateOrder: (order: Array<number>) => boolean;
   resetRecentlyChangedTasks: () => void;
   clearAnimationData: () => void;
+  finaliseSolution: () => void;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -239,6 +240,13 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
         }
       }, [temperatures, probabilities, solutions]);
 
+    
+  const finaliseSolution = () => {
+     setDisplayTemperatures(temperatures);
+     setDisplayProbabilities(probabilities);
+     setDisplayCmax(solutions.map((solution) => solution.cmax));
+  }
+
 
   const updateAllSolutions = useCallback(
     (incomingSolutions: Array<Solution>) => {
@@ -341,6 +349,7 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
     updateSolutionCharts,
     resetRecentlyChangedTasks,
     clearAnimationData,
+    finaliseSolution
   };
 
   return <TaskContext.Provider value={value}>{children}</TaskContext.Provider>;
