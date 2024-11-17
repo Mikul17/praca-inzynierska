@@ -28,7 +28,7 @@ export default function StartButton() {
   } = useTaskContext();
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const { isSendable, algorithmParameters  } = useParameters();
-  const { setLock } = useLock();
+  const { lock, setLock } = useLock();
 
   const { setSessionId, connect } = useWebSocket();
   const {  } = useParameters();
@@ -105,7 +105,7 @@ export default function StartButton() {
       }
       className="shadow-outer-shadow bg-secondary hover:bg-primary"
       size="lg"
-      isDisabled={!isFileLoaded || !isSendable}
+      isDisabled={!isFileLoaded || !isSendable || lock}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={newHandleClick}
