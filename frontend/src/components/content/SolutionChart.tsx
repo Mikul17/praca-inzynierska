@@ -3,22 +3,30 @@ import Chart from "react-google-charts";
 
 interface ChartProps {
   readonly data: number[];
+  readonly iterationOffset: number;
   readonly title: string;
   readonly xAxisTitle: string;
   readonly yAxisTitle: string;
 }
 
-const SolutionChart = memo(function SolutionChart({ data, title, xAxisTitle, yAxisTitle }: ChartProps) {
+const SolutionChart = memo(function SolutionChart({
+  data,
+  title,
+  xAxisTitle,
+  yAxisTitle,
+  iterationOffset,
+}: ChartProps) {
   const chartData = useMemo(() => {
     if (data.length > 0) {
       const mappedData: Array<(string | number)[]> = [[yAxisTitle, xAxisTitle]];
       data.forEach((value, index) => {
-        mappedData.push([index + 1, value]);
+        const iterationNumber = index + iterationOffset + 1;
+        mappedData.push([iterationNumber, value]);
       });
       return mappedData;
     }
     return [];
-  }, [data]);
+  }, [data, iterationOffset]);
 
   const options = {
     title: title,

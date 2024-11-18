@@ -12,7 +12,7 @@ import ChangeParametersModal from "@/components/content/ChangeParametersModal";
 
 export default function GanttChartSection() {
   const { currentAlgorithm } = useAlgorithm();
-  const { sendResetTemperature, sendStopTemperatureChange, sendUpdateCoolingRate ,clearTabuList } = useWebSocket();
+  const { sendResetTemperature, sendStopTemperatureChange ,clearTabuList, stopTemperatureChangeFlag  } = useWebSocket();
   const { isOpen, onOpen, onOpenChange} = useDisclosure();
  
   const shouldGenerateControlButtons =
@@ -33,7 +33,7 @@ export default function GanttChartSection() {
           >
             <ControlButton text="Change cooling rate" onClick={onOpen} />
             <ControlButton text="Reset temperature" onClick={sendResetTemperature} />
-            <ControlButton text="Stop temperature change" onClick={sendStopTemperatureChange} />
+            <ControlButton text={stopTemperatureChangeFlag ? "Stop temperature change" : "Resume temperature change"} onClick={sendStopTemperatureChange} />
           </div>
         );
         break;

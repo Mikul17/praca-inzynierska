@@ -20,6 +20,7 @@ interface TaskContextType {
   isDataFetchingCompleted: boolean;
   displayTemperatures: Array<number>;
   displayProbabilities: Array<number>;
+  iterationOffset: number;
   displayCmax: Array<number>;
   rootNode: TreeNode | null;
   readyQueue: Array<number>;
@@ -106,6 +107,8 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
   const [notReadyQueue, setNotReadyQueue] = useState<Array<number>>([]);
   //Carlier Algorithm
   const [rootNode, setRootNode] = useState<TreeNode | null>(null);
+
+  const [iterationOffset, setIterationOffset] = useState<number>(0);
 
   const calculateCmax = (order: Array<number>): number => {
     let cmax = 0;
@@ -219,26 +222,40 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
     [bestSolution, setBestSolution, updateRecentlyChanged]
   );
 
-  const updateSolutionCharts = useCallback((frame: number) => {
-      if(temperatures[frame] !== undefined){
+  const updateSolutionCharts = useCallback(
+    (frame: number) => {
+      if (temperatures[frame] !== undefined) {
         setDisplayTemperatures((prev) => {
           const newTemperatures = [...prev, temperatures[frame]];
-          return newTemperatures.slice(-MAX_DATA_POINTS);
+          if (newTemperatures.length > MAX_DATA_POINTS) {
+            newTemperatures.shift();
+            setIterationOffset((prevOffset) => prevOffset + 1);
+          }
+          return newTemperatures;
         });
-        }
-        if(probabilities[frame] !== undefined){
-          setDisplayProbabilities((prev) => {
-            const newProbabilities = [...prev, probabilities[frame]];
-            return newProbabilities.slice(-MAX_DATA_POINTS);
-          });
-        }
-        if(solutions[frame] !== undefined){
+      }
+      if (probabilities[frame] !== undefined) {
+        setDisplayProbabilities((prev) => {
+          const newProbabilities = [...prev, probabilities[frame]];
+          if (newProbabilities.length > MAX_DATA_POINTS) {
+            newProbabilities.shift();
+          }
+          return newProbabilities;
+        });
+      }
+      if (solutions[frame] !== undefined) {
         setDisplayCmax((prev) => {
           const newCmax = [...prev, solutions[frame].cmax];
-          return newCmax.slice(-MAX_DATA_POINTS);
+          if (newCmax.length > MAX_DATA_POINTS) {
+            newCmax.shift();
+          }
+          return newCmax;
         });
-        }
-      }, [temperatures, probabilities, solutions]);
+      }
+    },
+    [temperatures, probabilities, solutions]
+  );
+  
 
     
   const finaliseSolution = () => {
@@ -339,6 +356,7 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
     bestSolution,
     isDataFetchingCompleted,
     tabuList,
+    iterationOffset,
     setIsDataFetchingCompleted,
     updateSolution,
     createSolution,

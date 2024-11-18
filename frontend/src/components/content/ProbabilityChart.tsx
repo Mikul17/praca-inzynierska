@@ -6,19 +6,21 @@ interface ChartProps {
   readonly title: string;
   readonly xAxisTitle: string;
   readonly yAxisTitle: string
+  readonly iterationOffset: number;
 }
 
-const ProbabilityChart = memo(function SolutionChart({ data, title, xAxisTitle, yAxisTitle }: ChartProps) {
+const ProbabilityChart = memo(function SolutionChart({ data, title, xAxisTitle, yAxisTitle, iterationOffset }: ChartProps) {
   const chartData = useMemo(() => {
     if (data.length > 0) {
       const mappedData: Array<(string | number)[]> = [[xAxisTitle, yAxisTitle]];
       data.forEach((value, index) => {
-        mappedData.push([index + 1, value]);
+        const iterationNumber = index + iterationOffset +1 ;
+        mappedData.push([iterationNumber, value]);
       });
       return mappedData;
     }
     return [];
-  }, [data]);
+  }, [data, iterationOffset]);
 
   const options = {
     title: title,

@@ -33,6 +33,7 @@ interface WebSocketContextProps {
   sendUpdateInitialTenure: (initialTenure: number) => void;
   isConnected: boolean;
   sessionId: string;
+  stopTemperatureChangeFlag: boolean;
 };
 
 const WebSocketContext = createContext<WebSocketContextProps | undefined>(undefined);
@@ -285,6 +286,7 @@ export const WebSocketProvider: React.FC<React.PropsWithChildren<{}>> = ({childr
     sendUpdateInitialTenure,
     isConnected,
     sessionId,
+    stopTemperatureChangeFlag
   };
 
   return (
