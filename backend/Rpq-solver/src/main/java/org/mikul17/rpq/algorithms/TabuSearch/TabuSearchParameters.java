@@ -50,11 +50,19 @@ public class TabuSearchParameters extends AlgorithmParameters {
             if (pendingChanges == null) {
                 pendingChanges = TabuSearchParameters.builder()
                         .maxIterations(maxIterations)
-                        .tabuListSize(tabuListSize)
                         .build();
+                if(isTenureDynamic){
+                    pendingChanges.isTenureDynamic = true;
+                    pendingChanges.initialTenure = initialTenure;
+                }else{
+                    pendingChanges.tabuListSize = tabuListSize;
+                }
             }
             if (map.containsKey("tabuListSize")) {
                 pendingChanges.tabuListSize = (int) map.get("tabuListSize");
+            }
+            if (map.containsKey("initialTenure")) {
+                pendingChanges.initialTenure = (int) map.get("initialTenure");
             }
         } finally {
             lock.unlock();
@@ -65,8 +73,12 @@ public class TabuSearchParameters extends AlgorithmParameters {
         lock.lock();
         try {
             if (pendingChanges != null) {
-                tabuListSize = pendingChanges.tabuListSize;
-                resizeTabuList = true;
+                if(pendingChanges.isTenureDynamic){
+                    initialTenure = pendingChanges.initialTenure;
+                }else{
+                    tabuListSize = pendingChanges.tabuListSize;
+                    resizeTabuList = true;
+                }
             }
             pendingChanges = null;
         } finally {

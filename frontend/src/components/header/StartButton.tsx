@@ -5,13 +5,13 @@ import { useFile } from "@/context/FileContext";
 import Icon from "../Icon";
 import useAnimationEffect from "@/hooks/useAnimationEffect";
 import { useTaskContext } from "@/context/TaskContext";
-import { useAlgorithm } from "@/context/AlgorithmContext";
+import { AlgorithmApiNames, useAlgorithm } from "@/context/AlgorithmContext";
 import { startScheduler } from "@/common/api";
-import useWebSocket from "@/hooks/useWebSocket";
 import toast from "react-hot-toast";
 import { useParameters } from "@/context/ParameterContext";
 import { AlgorithmParameters } from "@/common/types";
 import { useLock } from "@/context/LockContext";
+import { useWebSocket } from "@/hooks/useWebSocket";
 
 export default function StartButton() {
   const { isFileLoaded } = useFile();
@@ -30,8 +30,7 @@ export default function StartButton() {
   const { isSendable, algorithmParameters  } = useParameters();
   const { lock, setLock } = useLock();
 
-  const { setSessionId, connect } = useWebSocket();
-  const {  } = useParameters();
+  const { connect } = useWebSocket();
 
   const canAdvanceFrame = useCallback(
     (nextFrame) => {
@@ -61,11 +60,11 @@ export default function StartButton() {
       toast.success("Displaying best solution");
       finaliseSolution();
       setLock(false);
-    }, 500) 
+    }, 500),
   });
 
   useEffect(() => {
-    if (!isPlaying && !hasAnimationEnded && solutions[currentFrame + 1]) {
+    if (!isPlaying && !hasAnimationEnded && solutions[currentFrame]) {
       play();
     }
   }, [solutions, isPlaying, play, currentFrame, hasAnimationEnded]);
@@ -74,9 +73,9 @@ export default function StartButton() {
     try {
       let parametersToSend : AlgorithmParameters = algorithmParameters;
 
-      if (currentAlgorithm === "CarlierAlgorithm") {
+      if (currentAlgorithm === "CarlierAlgorithm" || currentAlgorithm === "SchrageAlgorithm") {
         parametersToSend = {
-          algorithm: currentAlgorithm,
+          algorithm: AlgorithmApiNames[currentAlgorithm],
           tasks,
           timeoutDuration: 1,
           parameters: {},
@@ -85,7 +84,6 @@ export default function StartButton() {
 
       const response = await startScheduler(parametersToSend);
       if (response) {
-        setSessionId(response);
         connect(response);
       }
     } catch (error) {
@@ -105,7 +103,7 @@ export default function StartButton() {
       }
       className="shadow-outer-shadow bg-secondary hover:bg-primary"
       size="lg"
-      isDisabled={!isFileLoaded || !isSendable || lock}
+      isDisabled={!isFileLoaded || !isSendable || lock || isPlaying}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={newHandleClick}

@@ -2,7 +2,6 @@
 import {  Tab, Tabs } from "@nextui-org/react";
 import GraphPage from "./GraphPage";
 import DataSection from "./Data/DataSection";
-import useWebSocket from "@/hooks/useWebSocket";
 
 interface PageContentProps {
   height: number;
@@ -13,11 +12,11 @@ export default function PageContent({ height }: PageContentProps) {
 
  
   return (
-    <div style={{ height: height, minHeight: height}} className="flex items-center flex-col p-3">
+    <div style={{ height: height, minHeight: height}} className="flex items-center flex-col p-3 ">
       <Tabs
         size="lg"
         classNames={{
-          tabList: "w-full flex",
+          tabList: "w-full flex border-t border-2 border-gray-200",
           panel: "w-full",
         }}
       >

@@ -1,8 +1,7 @@
 "use client";
-import { AlgorithmApiNames, useAlgorithm } from "@/context/AlgorithmContext";
+import { useAlgorithm } from "@/context/AlgorithmContext";
 import {
   Button,
-  Checkbox,
   Input,
   Modal,
   ModalBody,

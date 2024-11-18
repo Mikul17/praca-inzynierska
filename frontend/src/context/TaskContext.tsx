@@ -49,7 +49,8 @@ interface TaskContextType {
   ) => void;
   updateCarlierSolution: (
     solutions: Array<Solution>,
-    rootNode: TreeNode
+    rootNode: TreeNode,
+    bestSolution: Solution
   ) => void;
   setSolutionForAnimation: (solution: Solution, currentAlgorithm: string) => void;
   updateSolutionCharts: (frame: number) => void;
@@ -133,7 +134,6 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
   const validateOrder = useCallback(
     (order: Array<number>) => {
       const taskIds = tasks.map((task) => task.id);
-      console.log(`Order length: ${order.length}, Tasks length: ${tasks.length}`);
       if (order.length > tasks.length) {
         toast.error("Order cannot be longer than the number of tasks");
         return false;
@@ -249,7 +249,11 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
 
 
   const updateAllSolutions = useCallback(
-    (incomingSolutions: Array<Solution>) => {
+    (incomingSolutions: Array<Solution>, carlierOrSchrage: boolean) => {
+      if(carlierOrSchrage){
+        setSolutions(incomingSolutions);
+        return;
+      }
       setSolutions((prevSolutions) => {
         return [...prevSolutions, ...incomingSolutions]
     });
@@ -277,7 +281,7 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
 
   const updateSimulatedAnnealingSolution = useCallback(
     (incomingSolutions, incomingTemperatures, incomingProbabilities) => {
-      updateAllSolutions(incomingSolutions);
+      updateAllSolutions(incomingSolutions, false);
       setTemperatures((prev) => {
         return[...prev, ...incomingTemperatures];
       });
@@ -290,7 +294,7 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
 
   const updateTabuSearchSolution = useCallback(
     (incomingSolutions, incomingTabuList) => {
-      updateAllSolutions(incomingSolutions);
+      updateAllSolutions(incomingSolutions, false);
       setTabuList(incomingTabuList);
     },
     []
@@ -298,15 +302,16 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({
 
 
   const updateSchrageSolution = (incomingSolutions, incomingNonReadyQueue, incomingReadyQueue, bestSolution) => {
-    updateAllSolutions(incomingSolutions);
+    updateAllSolutions(incomingSolutions, true);
     setBestSolution(bestSolution)
     setNotReadyQueue(incomingNonReadyQueue);
     setReadyQueue(incomingReadyQueue);
   };
 
-  const updateCarlierSolution = (incomingSolutions, rootNode) => {
-    updateAllSolutions(incomingSolutions);
+  const updateCarlierSolution = (incomingSolutions, rootNode, bestSolution) => {
+    updateAllSolutions(incomingSolutions, true);
     setRootNode(rootNode);
+    setBestSolution(bestSolution);
   };
 
   const clearAnimationData = () => {

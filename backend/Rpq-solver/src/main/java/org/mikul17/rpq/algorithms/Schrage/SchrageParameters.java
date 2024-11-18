@@ -13,7 +13,8 @@ public class SchrageParameters extends AlgorithmParameters {
 
     @Override
     public void fromMap (Map<String, Object> map) {
-       preemptive = (boolean) map.get("preemptive");
+        //preemptive = (boolean) map.get("preemptive");
+       preemptive = false;
     }
 
     @Override

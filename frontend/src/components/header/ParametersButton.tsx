@@ -15,8 +15,8 @@ export default function ParametersButton() {
       onMouseLeave={() => setIsHovered(false)}
     >
       <Tooltip
-        isOpen={isHovered && currentAlgorithm === "CarlierAlgorithm"}
-        content="Carlier algorithm takes no parameters"
+        isOpen={isHovered && (currentAlgorithm === "CarlierAlgorithm" || currentAlgorithm === "SchrageAlgorithm")}
+        content= {currentAlgorithm==="CarlierAlgorithm" ?"Carlier algorithm takes no parameters" : "Schrage algorithm takes no parameters"}
         placement="top"
       >
           <Button
@@ -28,7 +28,8 @@ export default function ParametersButton() {
             onClick={onOpen}
             isDisabled={
               !currentAlgorithm ||
-              currentAlgorithm === "CarlierAlgorithm"
+              currentAlgorithm === "CarlierAlgorithm" ||
+              currentAlgorithm === "SchrageAlgorithm"
             }
           >
             Parameters
