@@ -5,6 +5,7 @@ import { TaskProvider } from "./TaskContext";
 import ContextSynchronizer from "./ContextSynchronizer";
 import { ParameterContextProvider } from "./ParameterContext";
 import { LockContextProvider } from "./LockContext";
+import { WebSocketProvider } from "@/hooks/useWebSocket";
 
 export function MainProvider({children}: { children: React.ReactNode }) {
     return (
@@ -15,7 +16,9 @@ export function MainProvider({children}: { children: React.ReactNode }) {
                         <ContextSynchronizer />
                         <ParameterContextProvider>
                          <LockContextProvider>
-                            {children}
+                            <WebSocketProvider>
+                                {children}
+                            </WebSocketProvider>
                          </LockContextProvider>
                         </ParameterContextProvider>
                     </TaskProvider>

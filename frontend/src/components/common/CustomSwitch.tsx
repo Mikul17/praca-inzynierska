@@ -1,6 +1,5 @@
 import { cn, Switch } from "@nextui-org/react";
-import { label } from "framer-motion/client";
-import { useEffect } from "react";
+
 
 
 interface CustomSwitchProps {
@@ -11,12 +10,6 @@ interface CustomSwitchProps {
 }
 
 export default function CustomSwitch({ label, checked, onChange, checkedByDefault = false }: CustomSwitchProps) {
-
-    useEffect(() => {
-       console.log("Przychodzi checked: ", checked);
-    }, [checked]);
-
-
     return (
         <Switch
         isSelected={checked}

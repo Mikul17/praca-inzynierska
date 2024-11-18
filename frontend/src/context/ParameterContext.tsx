@@ -15,6 +15,7 @@ interface ParametersContextType {
         parameters: Record<string, any>
       ) => boolean;
     resetParameters: () => void;
+    updateParameter: (key: string, value: any) => void;
 }
 
 const requiredParameters: Record<AlgorithmTypeKeys, Array<string>> = {
@@ -69,16 +70,28 @@ export const ParameterContextProvider: React.FC<{ children: React.ReactNode }> =
         return true;
     };
 
+    const updateParameter = (key: string, value: any) => {
+        if (algorithmParameters) {
+            setAlgorithmParameters({
+                ...algorithmParameters,
+                parameters: {
+                    ...algorithmParameters.parameters,
+                    [key]: value
+                }
+            });
+        }
+    }
 
     const value = {
         algorithmParameters,
         isSendable,
         setParameters,
-        resetParameters
+        resetParameters,
+        updateParameter
       };
 
       useEffect(() => {
-        if (currentAlgorithm !== undefined && currentAlgorithm === "CarlierAlgorithm"){
+        if (currentAlgorithm !== undefined && (currentAlgorithm === "CarlierAlgorithm" || currentAlgorithm === "SchrageAlgorithm")) {
             setIsSendable(true);
         }
     }, [currentAlgorithm]);

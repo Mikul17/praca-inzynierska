@@ -1,5 +1,4 @@
 "use client";
-import { Solution } from "@/common/types";
 import { useTaskContext } from "@/context/TaskContext";
 import Gap from "@/layout/Gap";
 import { Button, Input } from "@nextui-org/react";
@@ -10,7 +9,7 @@ export default function Searchbar() {
   const { createSolution, calculateCmax } = useTaskContext();
   return (
     <div
-      className="flex justify-center items-center bg-secondary shadow-outer-shadow"
+      className="flex justify-center items-center bg-secondary shadow-outer-shadow border-t border-2 border-gray-200"
       style={{ borderRadius: "1rem", padding: "0.45rem" }}
     >
       <Input
@@ -27,7 +26,7 @@ export default function Searchbar() {
       />
       <Gap size={16} orientation="vertical" />
       <Button
-        className="shadow-outer-shadow bg-secondary hover:bg-primary"
+        className="shadow-outer-shadow bg-secondary hover:bg-primary border-t border-2 border-gray-200"
         size="lg"
         onClick={() => createSolution(displayOrder)}
         isDisabled={ displayOrder.length === 0 || displayOrder.some((x) => isNaN(x)) }

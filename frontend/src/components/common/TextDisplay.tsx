@@ -9,7 +9,7 @@ interface TextDisplayProps {
 export default function TextDisplay({ header, children, margin }: TextDisplayProps) {
     return (
         <div
-            className="flex flex-col bg-secondary p-4 shadow-outer-shadow"
+            className="flex flex-col bg-secondary p-4 shadow-outer-shadow border-t border-2 border-gray-200"
             style={{ borderRadius: "1rem", margin: margin }}
         >
             <div className="text-md">{header}</div>
