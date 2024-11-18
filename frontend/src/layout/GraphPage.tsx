@@ -14,7 +14,7 @@ interface LayoutProps {
 }
 
 const GraphPage = memo(({ height }: LayoutProps) => {
-  const { solutions, displayTemperatures, displayProbabilities, displayCmax, readyQueue, notReadyQueue, rootNode } =
+  const { solutions, displayTemperatures, displayProbabilities, displayCmax, readyQueue, notReadyQueue, rootNode, iterationOffset } =
     useTaskContext();
   const { currentAlgorithm } = useAlgorithm();
 
@@ -32,6 +32,7 @@ const GraphPage = memo(({ height }: LayoutProps) => {
             yAxisTitle={"Iteration"}
             xAxisTitle={"Cmax"}
             key="cmaxSA"
+            iterationOffset={iterationOffset}
           />
         );
         charts.push(
@@ -41,6 +42,7 @@ const GraphPage = memo(({ height }: LayoutProps) => {
             yAxisTitle={"Iteration"}
             xAxisTitle={"Temperature"}
             key="temperatureSA"
+            iterationOffset={iterationOffset}
           />
         );
         charts.push(
@@ -50,6 +52,7 @@ const GraphPage = memo(({ height }: LayoutProps) => {
             yAxisTitle={"Iteration"}
             xAxisTitle={"Acceptance %"}
             key="probabilitySA"
+            iterationOffset={iterationOffset}
           />
         );
         return charts;
@@ -61,6 +64,7 @@ const GraphPage = memo(({ height }: LayoutProps) => {
             yAxisTitle={"Iteration"}
             xAxisTitle={"Cmax"}
             key="cmaxTS"
+            iterationOffset={iterationOffset}
           />
         );
         charts.push(<Gap size={32} orientation="horizontal" key="gapTS" />);
@@ -84,7 +88,8 @@ const GraphPage = memo(({ height }: LayoutProps) => {
     displayTemperatures,
     displayProbabilities,
     displayCmax,
-    rootNode
+    rootNode,
+    iterationOffset
   ]);
 
   return (
